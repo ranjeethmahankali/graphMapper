@@ -2,6 +2,7 @@ def getConSpaces(numSpace, num):
     possibleConnections = numSpace*(numSpace-1)/2
     if num > possibleConnections - 1:
         print('The connection index exceeds the total possible connections')
+        return None
 
     s1 = None
     s2 = None
