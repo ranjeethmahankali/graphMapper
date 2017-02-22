@@ -22,6 +22,16 @@ class space(cSpace):
         # determined by the orientation of the space that it is dividing
         self.wallPos = list()
         self.addChildren(childList)
+    
+    # this function will populate the ptList randomly
+    # write this func and call it at the instance creation
+    def populatePts():
+        return
+
+    # this function will calculate the positions of the walls
+    # write this func and call it in a loop while creating the dataset
+    def makewalls():
+        return
         
     #returns the indices of the two spaces corresponding to the connection number
     def getConSpaces(num):
