@@ -1,16 +1,19 @@
 from spaceGraph import *
 from PIL import Image, ImageDraw
+import random
 
 #this is a modified implementation of the cSpace class that is customized for tensorflow
 class space(cSpace):
-    def __init__(self, name, childList, parentSpace = None):
+    def __init__(self, name, childList, dimensions, parentSpace = None):
         super().__init__(name, parentSpace)
         # this is the list which has all the children
         # this is needed because we need indices, and the original children dictionary in
         # cSpace class does not provide any indices
         self.cL = childList
+        # this list has the dimensions of the space in [width, height] format
+        self.dim = dimensions
         # orientation property can either be 1 or 0, 0 implies landscape, 1 implies portrait 
-        self.orientation = 0
+        self.orientation = self.getOrientation(self.dim)
         # this is the list of points that is used to calculate the wall positions
         self.ptList = list()
         # this is a list of points, one corresponding to one wall, the orientation of the wall is
@@ -19,9 +22,22 @@ class space(cSpace):
         # adding a new space as a child for every name in the childList
         self.addChildren([cSpace(cName) for cName in self.cL])
     
+    # this function will return the value for the orientation depending on the dimensions - dims param
+    def getOrientation(dims):
+        if dims[0] >= dims[1]:
+            return 0
+        else:
+            return 1
+
     # this function will populate the ptList randomly
     # write this func and call it at the instance creation
     def populatePts(self):
+        self.ptList = []
+        for i in range(len(self.cL)):
+            xPos = random.randint(1, self.dim[0])
+            yPos = random.randint(1, self.dim[1])
+            self.ptList.append([xPos, yPos])
+            
         return
 
     # this function will calculate the positions of the walls
@@ -85,7 +101,7 @@ spaceList = ['red',
             'yellow',
             'white']
 
-sample = space('sample', spaceList, None)
+sample = space('sample', spaceList, [64,48])
 
 # for i in range(dataNum):
     # populate sample with pts
