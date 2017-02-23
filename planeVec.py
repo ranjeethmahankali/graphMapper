@@ -135,3 +135,12 @@ def intersectionPt(a1, a2, b1, b2):
         else:
             #this means the infinite lines intersect but the segments don't
             return None
+
+# this method returns the mean of the vectors in vList
+def meanVec(vList):
+    vec = [0,0]
+    for v in vList:
+        vec = vSum(vec, v)
+    
+    num = len(vList)
+    return vPrd(vec, 1/num)
