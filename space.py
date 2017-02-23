@@ -6,7 +6,7 @@ import planeVec as pv
 #this is a modified implementation of the cSpace class that is customized for tensorflow
 class space(cSpace):
     def __init__(self, name, childList, dimensions, parentSpace = None):
-        super().__init__(name, parentSpace)
+        cSpace.__init__(self,name, parentSpace)
         # this is the list which has all the children
         # this is needed because we need indices, and the original children dictionary in
         # cSpace class does not provide any indices
@@ -23,7 +23,7 @@ class space(cSpace):
         self.addChildren([cSpace(cName) for cName in self.cL])
     
     # this function will return the value for the orientation depending on the dimensions - dims param
-    def getOrientation(dims):
+    def getOrientation(self,dims):
         if dims[0] >= dims[1]:
             return 0
         else:
@@ -42,11 +42,17 @@ class space(cSpace):
 
     # this function will calculate the positions of the walls
     # write this func and call it in a loop while creating the dataset
-    def makeWalls(self, split = [{'pt':self.ptList,'x0':0,'y0':0,'x1':self.dim[0],'y1':self.dim[1]}], new=True):
+    def makeWalls(self, split = None, new=True):
         # split is a list of jobs to do. Each job is a set of points and the x,y limits of the space
         # they occupy. The job needs to be popped from the list, then points need to be split with a
         # new wall, resulting in two new jobs. This recursion will continue unless the job has only one
         # point in it.
+        
+        #default values
+        if split is None:
+            split = [{'pt':self.ptList,'x0':0,'y0':0,'x1':self.dim[0],'y1':self.dim[1]}]
+        
+        #resetting walls if new
         if new:
             self.walls = []
 
@@ -156,3 +162,5 @@ sample = space('sample', spaceList, [64,48])
     # populate sample with pts
     # make walls
     # export the training example
+sample.populatePts()
+sample.makeWalls()
