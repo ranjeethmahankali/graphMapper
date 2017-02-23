@@ -1,6 +1,7 @@
 from spaceGraph import *
 from PIL import Image, ImageDraw
 import random
+import planeVec as pv
 
 #this is a modified implementation of the cSpace class that is customized for tensorflow
 class space(cSpace):
@@ -16,9 +17,8 @@ class space(cSpace):
         self.orientation = self.getOrientation(self.dim)
         # this is the list of points that is used to calculate the wall positions
         self.ptList = list()
-        # this is a list of points, one corresponding to one wall, the orientation of the wall is
-        # determined by the orientation of the space that it is dividing
-        self.wallPos = list()
+        # this is a list of items, with each being a list having an end point start and end point of the wall
+        self.walls = list()
         # adding a new space as a child for every name in the childList
         self.addChildren([cSpace(cName) for cName in self.cL])
     
@@ -42,7 +42,56 @@ class space(cSpace):
 
     # this function will calculate the positions of the walls
     # write this func and call it in a loop while creating the dataset
-    def makewalls(self):
+    def makeWalls(self, split = [{'pt':self.ptList,'x0':0,'y0':0,'x1':self.dim[0],'y1':self.dim[1]}], new=True):
+        # split is a list of jobs to do. Each job is a set of points and the x,y limits of the space
+        # they occupy. The job needs to be popped from the list, then points need to be split with a
+        # new wall, resulting in two new jobs. This recursion will continue unless the job has only one
+        # point in it.
+        if new:
+            self.walls = []
+
+        job = split.pop()
+        if len(job['pt']) <= 1:
+            return
+        
+        wallPt = pv.meanVec(job['pt'])
+        dims = [job['x1'] - job['x0'], job['y1'] - job['y0']]
+        orn = self.getOrientation(dims)
+        startPt = None
+        endPt = None
+        job1 = None
+        job2 = None
+        if orn == 0:
+            #do sth for landscape
+            startPt = [wallPt[0], job['y0']]
+            endPt = [wallPt[0], job['y1']]
+            #split the job into two
+            job1 = {'pt':list(), 'x0': job['x0'], 'x1':wallPt[0], 'y0':job['y0'], 'y1':job['y1']}
+            job2 = {'pt':list(), 'x0':wallPt[0], 'x1': job['x1'], 'y0':job['y0'], 'y1':job['y1']}
+            # now distribute points between the new jobs
+            for pt in job['pt']:
+                if pt[0] <= wallPt[0]:
+                    job1['pt'].append(pt)
+                else:
+                    job2['pt'].append(pt)
+        elif orn == 1:
+            # do sth for portrait
+            startPt = [job['x0'], wallPt[1]]
+            endPt = [job['x1'], wallPt[1]]
+            #split the job into two
+            job1 = {'pt':list(), 'x0': job['x0'], 'x1': job['x1'], 'y0':job['y0'], 'y1':wallPt[1]}
+            job2 = {'pt':list(), 'x0': job['x0'], 'x1': job['x1'], 'y0':wallPt[1], 'y1':job['y1']}
+            # now distribute points between the new jobs
+            for pt in job['pt']:
+                if pt[1] <= wallPt[1]:
+                    job1['pt'].append(pt)
+                else:
+                    job2['pt'].append(pt)
+                
+        self.walls.append([startPt, endPt])
+        split += [job1, job2]
+        self.makeWalls(split, new = False)
+        
         return
         
     #returns the indices of the two spaces corresponding to the connection number
