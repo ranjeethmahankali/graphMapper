@@ -1,12 +1,25 @@
-from spaceGraph import *
+import spaceGraph as sg
+from ops import *
 from PIL import Image, ImageDraw
 import random
 import planeVec as pv
 
+# this is the 'wall' object
+class wall:
+    def __init__(self, startPt, endPt, drawColor = '#000000'):
+        self.start = startPt
+        self.end = endPt
+        self.color = drawColor
+    
+    # this method draws the wall onto the provided PIl img - pending
+    def render(img):
+        return
+
+
 #this is a modified implementation of the cSpace class that is customized for tensorflow
-class space(cSpace):
+class space(sg.cSpace):
     def __init__(self, name, childList, dimensions, parentSpace = None):
-        cSpace.__init__(self,name, parentSpace)
+        sg.cSpace.__init__(self,name, parentSpace)
         # this is the list which has all the children
         # this is needed because we need indices, and the original children dictionary in
         # cSpace class does not provide any indices
@@ -20,7 +33,7 @@ class space(cSpace):
         # this is a list of items, with each being a list having an end point start and end point of the wall
         self.walls = list()
         # adding a new space as a child for every name in the childList
-        self.addChildren([cSpace(cName) for cName in self.cL])
+        self.addChildren([sg.cSpace(cName) for cName in self.cL])
     
     # this function will return the value for the orientation depending on the dimensions - dims param
     def getOrientation(self,dims):
@@ -100,7 +113,21 @@ class space(cSpace):
         
         return
         
-    #returns the indices of the two spaces corresponding to the connection number
+    # this def renders the space into an image using PIL and returns that img
+    def render(showPt = False):#showPt param decides whether to show pts or not - pending
+        background = Image.new("RGB", self.dim, "white")
+        wallLayout = Image.new("RGBA", self.dim)
+        # draw room background colors on background
+        # draw walls on the wallLayout
+        # create openings in the wall layout
+        # draw wallLayout image on top of background
+        # convert the whole thing into RGB and return it
+        return
+    
+    # This def calculates the wall that separates two particular spaces and returns the index
+    def borderWall(): #- pending
+        return
+    # #returns the indices of the two spaces corresponding to the connection number
     def getConSpaces(self, num):
         numSpace = len(self.cL)
         possibleConnections = numSpace*(numSpace-1)/2
