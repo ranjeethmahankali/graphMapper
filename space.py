@@ -24,11 +24,10 @@ class wall:
 #this is a modified implementation of the cSpace class that is customized for tensorflow
 class space(sg.cSpace):
     def __init__(self, name, childNames, coord={'pt':[],'x0':0,'y0':0,'x1':spaceSize[0],'y1':spaceSize[1]}, parentSpace = None):
-        sg.cSpace.__init__(self,name, parentSpace)
+        sg.cSpace.__init__(self, name, parentSpace)
         # this is the list which has all the children
         # this is needed because we need indices, and the original children dictionary in
         # cSpace class does not provide any indices
-        self.cL = childList
         # this list has the dimensions of the space in [width, height] format
         self.coord = coord
         self.dim = [self.coord['x1'] - self.coord['x0'], self.coord['y1'] - self.coord['y0']]
@@ -52,7 +51,7 @@ class space(sg.cSpace):
     # write this func and call it at the instance creation
     def populatePts(self):
         self.ptList = []
-        for i in range(len(self.cL)):
+        for i in range(len(self.childNames)):
             xPos = random.randint(1, self.dim[0])
             yPos = random.randint(1, self.dim[1])
             self.ptList.append([xPos, yPos])
@@ -66,11 +65,14 @@ class space(sg.cSpace):
         # they occupy. The job needs to be popped from the list, then points need to be split with a
         # new wall, resulting in two new jobs. This recursion will continue unless the job has only one
         # point in it.
-        
+
         #default values
         if split is None:
             split = [{'pt':self.ptList,'x0':0,'y0':0,'x1':self.dim[0],'y1':self.dim[1]}]
         
+        if len(split) == 0:#nothing to do
+            return
+
         #resetting walls if new
         if new:
             self.walls = []
@@ -78,66 +80,73 @@ class space(sg.cSpace):
         job = split.pop()
         if len(job['pt']) <= 1:#nothing to divide
             #create space and add as a child to this space
-            newSpace = space(self.childNames.pop(), job, self)
-            return
-        
-        wallPt = pv.meanVec(job['pt'])
-        dims = [job['x1'] - job['x0'], job['y1'] - job['y0']]
-        orn = self.getOrientation(dims)
-        startPt = None
-        endPt = None
-        job1 = None
-        job2 = None
-        if orn == 0:
-            #do sth for landscape
-            startPt = [wallPt[0], job['y0']]
-            endPt = [wallPt[0], job['y1']]
-            #split the job into two
-            job1 = {'pt':list(), 'x0': job['x0'], 'x1':wallPt[0], 'y0':job['y0'], 'y1':job['y1']}
-            job2 = {'pt':list(), 'x0':wallPt[0], 'x1': job['x1'], 'y0':job['y0'], 'y1':job['y1']}
-            # now distribute points between the new jobs
-            for pt in job['pt']:
-                if pt[0] <= wallPt[0]:
-                    job1['pt'].append(pt)
-                else:
-                    job2['pt'].append(pt)
-        elif orn == 1:
-            # do sth for portrait
-            startPt = [job['x0'], wallPt[1]]
-            endPt = [job['x1'], wallPt[1]]
-            #split the job into two
-            job1 = {'pt':list(), 'x0': job['x0'], 'x1': job['x1'], 'y0':job['y0'], 'y1':wallPt[1]}
-            job2 = {'pt':list(), 'x0': job['x0'], 'x1': job['x1'], 'y0':wallPt[1], 'y1':job['y1']}
-            # now distribute points between the new jobs
-            for pt in job['pt']:
-                if pt[1] <= wallPt[1]:
-                    job1['pt'].append(pt)
-                else:
-                    job2['pt'].append(pt)
-                
-        self.walls.append(wall(startPt, endPt))
-        split += [job1, job2]
+            newSpace = space(self.childNames.pop(),[], job, self)
+        else:
+            wallPt = pv.meanVec(job['pt'])
+            dims = [job['x1'] - job['x0'], job['y1'] - job['y0']]
+            orn = self.getOrientation(dims)
+            startPt = None
+            endPt = None
+            job1 = None
+            job2 = None
+            if orn == 0:
+                #do sth for landscape
+                startPt = [wallPt[0], job['y0']]
+                endPt = [wallPt[0], job['y1']]
+                #split the job into two
+                job1 = {'pt':list(), 'x0': job['x0'], 'x1':wallPt[0], 'y0':job['y0'], 'y1':job['y1']}
+                job2 = {'pt':list(), 'x0':wallPt[0], 'x1': job['x1'], 'y0':job['y0'], 'y1':job['y1']}
+                # now distribute points between the new jobs
+                for pt in job['pt']:
+                    if pt[0] <= wallPt[0]:
+                        job1['pt'].append(pt)
+                    else:
+                        job2['pt'].append(pt)
+            elif orn == 1:
+                # do sth for portrait
+                startPt = [job['x0'], wallPt[1]]
+                endPt = [job['x1'], wallPt[1]]
+                #split the job into two
+                job1 = {'pt':list(), 'x0': job['x0'], 'x1': job['x1'], 'y0':job['y0'], 'y1':wallPt[1]}
+                job2 = {'pt':list(), 'x0': job['x0'], 'x1': job['x1'], 'y0':wallPt[1], 'y1':job['y1']}
+                # now distribute points between the new jobs
+                for pt in job['pt']:
+                    if pt[1] <= wallPt[1]:
+                        job1['pt'].append(pt)
+                    else:
+                        job2['pt'].append(pt)
+                    
+            self.walls.append(wall(startPt, endPt))
+            split += [job1, job2]
+            # print(len(job1['pt']), len(job2['pt']))
+
         self.makeWalls(split, new = False)
-        
         return
         
     # this def renders the space into an image using PIL and returns that img
-    def render(showPt = False):#showPt param decides whether to show pts or not - pending
+    def render(self, showPt = False):#showPt param decides whether to show pts or not - pending
+        global colors
         background = Image.new("RGB", self.dim, "white")
         wallLayout = Image.new("RGBA", self.dim)
         # draw room background colors on background
+        # with ImageDraw.Draw(background) as draw:
+        draw = ImageDraw.Draw(background)
+        for cName in self.c:
+            box = [self.coord['x0'], self.coord['y0'], self.coord['x1'], self.coord['y1']]
+            draw.rectangle(box,colors[cName])
+        del draw
         # draw walls on the wallLayout
         # create openings in the wall layout
         # draw wallLayout image on top of background
         # convert the whole thing into RGB and return it
-        return
+        return background
     
     # This def calculates the wall that separates two particular spaces and returns the index
     def borderWall(): #- pending
         return
     # #returns the indices of the two spaces corresponding to the connection number
     def getConSpaces(self, num):
-        numSpace = len(self.cL)
+        numSpace = len(self.childNames)
         possibleConnections = numSpace*(numSpace-1)/2
         if num > possibleConnections - 1:
             print('The connection index exceeds the total possible connections')
@@ -164,7 +173,7 @@ class space(sg.cSpace):
 
     #returns the index of te connection between the two spaces, whose indices are supplied as parameters.
     def getConIndex(self, sA,sB):
-        numSpace = len(self.cL)
+        numSpace = len(self.childNames)
         if sA >= numSpace or sB >= numSpace:
             print('Invalid space indices')
             return None
@@ -185,13 +194,22 @@ class space(sg.cSpace):
 
 # the main logic begins here
 # this is the space list for the dataset
-spaceList = ['red',
+nameList = ['red',
             'green',
             'blue',
             'yellow',
             'white']
 
-sample = space('sample', spaceList, [64,48])
+colors = {
+    'red':(255,0,0),
+    'green':(0,255,0),
+    'blue':(0,0,255),
+    'yellow':(255,255,0),
+    'white':(255,255,255)
+}
+
+coords = {'pt':[], 'x0':0,'x1':64,'y0':0,'y1':48}
+sample = space('sample', nameList, coords)
 
 # for i in range(dataNum):
     # populate sample with pts
@@ -199,3 +217,5 @@ sample = space('sample', spaceList, [64,48])
     # export the training example
 sample.populatePts()
 sample.makeWalls()
+img = sample.render()
+img.show()
