@@ -4,6 +4,8 @@ from PIL import Image, ImageDraw
 import random
 import planeVec as pv
 
+spaceSize = [64,48]
+
 # this is the 'wall' object
 class wall:
     def __init__(self, startPt, endPt, drawColor = '#000000'):
@@ -13,27 +15,31 @@ class wall:
     
     # this method draws the wall onto the provided PIl img - pending
     def render(img):
-        return
+        draw = ImageDraw.Draw(img)
+        draw.line(self.start + self.end, fill = 0)
+        del draw
+        return img
 
 
 #this is a modified implementation of the cSpace class that is customized for tensorflow
 class space(sg.cSpace):
-    def __init__(self, name, childList, dimensions, parentSpace = None):
+    def __init__(self, name, childNames, coord={'pt':[],'x0':0,'y0':0,'x1':spaceSize[0],'y1':spaceSize[1]}, parentSpace = None):
         sg.cSpace.__init__(self,name, parentSpace)
         # this is the list which has all the children
         # this is needed because we need indices, and the original children dictionary in
         # cSpace class does not provide any indices
         self.cL = childList
         # this list has the dimensions of the space in [width, height] format
-        self.dim = dimensions
+        self.coord = coord
+        self.dim = [self.coord['x1'] - self.coord['x0'], self.coord['y1'] - self.coord['y0']]
         # orientation property can either be 1 or 0, 0 implies landscape, 1 implies portrait 
         self.orientation = self.getOrientation(self.dim)
         # this is the list of points that is used to calculate the wall positions
-        self.ptList = list()
+        self.ptList = coord['pt']
         # this is a list of items, with each being a list having an end point start and end point of the wall
         self.walls = list()
         # adding a new space as a child for every name in the childList
-        self.addChildren([sg.cSpace(cName) for cName in self.cL])
+        self.childNames = childNames
     
     # this function will return the value for the orientation depending on the dimensions - dims param
     def getOrientation(self,dims):
@@ -70,7 +76,9 @@ class space(sg.cSpace):
             self.walls = []
 
         job = split.pop()
-        if len(job['pt']) <= 1:
+        if len(job['pt']) <= 1:#nothing to divide
+            #create space and add as a child to this space
+            newSpace = space(self.childNames.pop(), job, self)
             return
         
         wallPt = pv.meanVec(job['pt'])
@@ -107,7 +115,7 @@ class space(sg.cSpace):
                 else:
                     job2['pt'].append(pt)
                 
-        self.walls.append([startPt, endPt])
+        self.walls.append(wall(startPt, endPt))
         split += [job1, job2]
         self.makeWalls(split, new = False)
         
