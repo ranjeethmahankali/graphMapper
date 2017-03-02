@@ -17,6 +17,21 @@ learning_rate = 1e-5
 model_save_path = ['savedModels/model_1.ckpt',
                     'savedModels/model_2.ckpt']
 
+# in every traning example, these will be the names of the 5 spaces
+nameList = ['red',
+            'green',
+            'blue',
+            'yellow',
+            'white']
+# And this dictionary provides the color as RGB tuple for a space with a certian name
+colors = {
+    'red':(255,0,0),
+    'green':(0,255,0),
+    'blue':(0,0,255),
+    'yellow':(255,255,0),
+    'white':(255,255,255)
+}
+
 # this method saves the model
 def saveModel(sess, savePath):
     print('\n...saving the models, please wait...')
