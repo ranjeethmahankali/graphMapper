@@ -22,7 +22,20 @@ class wall:
         return "[%s, %s]"%(self.start, self.end)
 
 
-#this is a modified implementation of the cSpace class that is customized for tensorflow
+# this is the door class
+class door:
+    def __init__(self, parentWall, doorPos, doorSize = 4, doorColor=(255,255,255)):
+        self.size = doorSize
+        self.wall = parentWall
+        # this is the 
+        self.pos = doorPos
+    
+    def render(self, img):
+        draw = ImageDraw.Draw(img)
+        # draw the door
+        del draw
+
+# this is a modified implementation of the cSpace class that is customized for tensorflow
 class space(sg.cSpace):
     def __init__(self, name, childNames, coord={'pt':[],'x0':0,'y0':0,'x1':spaceSize[0],'y1':spaceSize[1]}, parentSpace = None):
         sg.cSpace.__init__(self, name, parentSpace)
@@ -38,7 +51,9 @@ class space(sg.cSpace):
         self.ptList = coord['pt']
         # this is a list of items, with each being a list having an end point start and end point of the wall
         self.walls = list()
-        # adding a new space as a child for every name in the childList
+        # shuffling the names just before making them a property so that they come out different
+        # everytime, more diversity in the dataset
+        random.shuffle(childNames)
         self.childNames = childNames
     
     # this function will return the value for the orientation depending on the dimensions - dims param
@@ -79,6 +94,8 @@ class space(sg.cSpace):
             self.walls = []
 
         job = split.pop()
+        if len(job['pt']) == 0:
+            return
         if len(job['pt']) == 1:#nothing to divide
             #create space and add as a child to this space
             newSpace = space(self.childNames.pop(),[], job, self)
@@ -206,19 +223,6 @@ class space(sg.cSpace):
 
 # the main logic begins here
 # this is the space list for the dataset
-nameList = ['red',
-            'green',
-            'blue',
-            'yellow',
-            'white']
-
-colors = {
-    'red':(255,0,0),
-    'green':(0,255,0),
-    'blue':(0,0,255),
-    'yellow':(255,255,0),
-    'white':(255,255,255)
-}
 
 coords = {'pt':[], 'x0':0,'x1':64,'y0':0,'y1':48}
 sample = space('sample', nameList, coords)
