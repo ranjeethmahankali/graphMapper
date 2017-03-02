@@ -4,8 +4,6 @@ from PIL import Image, ImageDraw
 import random
 import planeVec as pv
 
-spaceSize = [64,48]
-
 # this is the 'wall' object
 class wall:
     def __init__(self, startPt, endPt, drawColor = '#000000'):
@@ -14,11 +12,14 @@ class wall:
         self.color = drawColor
     
     # this method draws the wall onto the provided PIl img - pending
-    def render(img):
+    def render(self, img = Image.new("RGB", spaceSize, "white"), color=0):
         draw = ImageDraw.Draw(img)
-        draw.line(self.start + self.end, fill = 0)
+        draw.line(self.start + self.end, fill = color)
         del draw
         return img
+    # this is the default string parsing
+    def __str__(self):
+        return "[%s, %s]"%(self.start, self.end)
 
 
 #this is a modified implementation of the cSpace class that is customized for tensorflow
@@ -78,7 +79,7 @@ class space(sg.cSpace):
             self.walls = []
 
         job = split.pop()
-        if len(job['pt']) <= 1:#nothing to divide
+        if len(job['pt']) == 1:#nothing to divide
             #create space and add as a child to this space
             newSpace = space(self.childNames.pop(),[], job, self)
         else:
@@ -128,18 +129,29 @@ class space(sg.cSpace):
         global colors
         background = Image.new("RGB", self.dim, "white")
         wallLayout = Image.new("RGBA", self.dim)
+        mask = Image.new("RGBA", self.dim)
         # draw room background colors on background
         # with ImageDraw.Draw(background) as draw:
         draw = ImageDraw.Draw(background)
         for cName in self.c:
-            box = [self.coord['x0'], self.coord['y0'], self.coord['x1'], self.coord['y1']]
+            box = [self.c[cName].coord['x0'], 
+                    self.c[cName].coord['y0'],
+                    self.c[cName].coord['x1'], 
+                    self.c[cName].coord['y1']]
             draw.rectangle(box,colors[cName])
         del draw
+
         # draw walls on the wallLayout
+        for wall in self.walls:
+            wallLayout = wall.render(wallLayout)
+            mask = wall.render(mask, color=(255,255,255))
+        
         # create openings in the wall layout
         # draw wallLayout image on top of background
+        background.paste(wallLayout.convert("RGB"), (0,0), mask)
+        # mask.save('mask2.png')
         # convert the whole thing into RGB and return it
-        return background
+        return background.convert("RGB")
     
     # This def calculates the wall that separates two particular spaces and returns the index
     def borderWall(): #- pending
@@ -218,4 +230,9 @@ sample = space('sample', nameList, coords)
 sample.populatePts()
 sample.makeWalls()
 img = sample.render()
+# for w in sample.walls:
+#     print(w)
+
+# img = sample.walls[0].render()
+# img = sample.render()
 img.show()

@@ -13,7 +13,7 @@ def lineAngle(x0,y0,x1,y1):
         if y1 > y0:
             angle = math.atan((y1-y0)/(x1-x0))
         elif y1 == y0:
-            angle = 0;
+            angle = 0
         else:
             angle = math.atan((y1-y0)/(x1-x0)) + (2*math.pi)
     elif x1 == x0:

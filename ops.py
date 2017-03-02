@@ -8,7 +8,8 @@ from PIL import Image
 # some global params
 # the directory to which teh results will be saved
 # imgSize = [96,128]
-imgSize = [48, 64]
+imgSize = [64,48]
+spaceSize = [64,48]
 batch_size = 5
 # resDir = 'results/'
 resDir = 'results/'
