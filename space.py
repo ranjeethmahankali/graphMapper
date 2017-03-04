@@ -3,6 +3,7 @@ from ops import *
 from PIL import Image, ImageDraw
 import random
 import planeVec as pv
+import math
 
 # this is the 'wall' object
 class wall:
@@ -10,6 +11,8 @@ class wall:
         self.start = startPt
         self.end = endPt
         self.color = drawColor
+        # this is the list of all doors located on this wall
+        self.doors = list()
     
     # this method draws the wall onto the provided PIl img - pending
     def render(self, img = Image.new("RGB", spaceSize, "white"), color=0):
@@ -25,15 +28,39 @@ class wall:
 # this is the door class
 class door:
     def __init__(self, parentWall, doorPos, doorSize = 4, doorColor=(255,255,255)):
-        self.size = doorSize
+        self.size = abs(doorSize)
         self.wall = parentWall
-        # this is the 
+        parentWall.doors.append(self)
+        # this is the parameter between 0 and 1 representing the position of door on the line
         self.pos = doorPos
+        # this color will be used to render the door
+        self.color = doorColor
     
     def render(self, img):
         draw = ImageDraw.Draw(img)
+        # offset the door from ends of wall to avoid awkward joints
+        offset = math.ceil((self.size / 2)+1)
+        offsetRatio = offset / (pv.mod(pv.vDiff(self.wall.end, self.wall.start)))
+        # these are the start and end points of the wall after accounting for the offset
+        newStart = pv.linEval(self.wall.start, self.wall.end, offsetRatio)
+        newEnd = pv.linEval(self.wall.end, self.wall.start, offsetRatio)
+        # now evaluating door position between these new start and new end points
+        xypos = pv.linEval(newStart, newEnd, self.pos)
         # draw the door
+        hSize = self.size/2
+        coord = [xypos[0] - hSize,
+                xypos[1] - hSize,
+                xypos[0] + hSize,
+                xypos[1] + hSize]
+        
+        draw.rectangle(coord, self.color)
+
         del draw
+        return img
+    
+    # default string parsing
+    def __str__(self):
+        return "Door at %s"%(self.pos)
 
 # this is a modified implementation of the cSpace class that is customized for tensorflow
 class space(sg.cSpace):
@@ -146,6 +173,7 @@ class space(sg.cSpace):
         global colors
         background = Image.new("RGB", self.dim, "white")
         wallLayout = Image.new("RGBA", self.dim)
+        doorMask = Image.new("RGBA", self.dim)
         mask = Image.new("RGBA", self.dim)
         # draw room background colors on background
         # with ImageDraw.Draw(background) as draw:
@@ -162,13 +190,18 @@ class space(sg.cSpace):
         for wall in self.walls:
             wallLayout = wall.render(wallLayout)
             mask = wall.render(mask, color=(255,255,255))
-        
+            # render doors here
+            for dr in wall.doors:
+                doorMask = dr.render(doorMask)
         # create openings in the wall layout
         # draw wallLayout image on top of background
-        background.paste(wallLayout.convert("RGB"), (0,0), mask)
+        finalPlan = Image.new("RGB", self.dim, "white")
+        finalPlan.paste(background, (0,0))
+        finalPlan.paste(wallLayout.convert("RGB"), (0,0), mask)
+        finalPlan.paste(background, (0,0), doorMask)
         # mask.save('mask2.png')
         # convert the whole thing into RGB and return it
-        return background.convert("RGB")
+        return finalPlan
     
     # This def calculates the wall that separates two particular spaces and returns the index
     def borderWall(): #- pending
@@ -233,6 +266,12 @@ sample = space('sample', nameList, coords)
     # export the training example
 sample.populatePts()
 sample.makeWalls()
+
+# adding doors to test rendering
+for wall in sample.walls:
+    dr = door(wall, 0.2)
+    # print(len(wall.doors), wall.doors[-1])
+
 img = sample.render()
 # for w in sample.walls:
 #     print(w)
