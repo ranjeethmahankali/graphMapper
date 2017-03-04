@@ -143,3 +143,14 @@ def meanVec(vList):
     
     num = len(vList)
     return vPrd(vec, 1/num)
+
+# this method if t = 0.6 then it returns the point that is 60% away from p0 towards
+# p1, just like the evaluate curve method in rhino, but much dumber and only for straight lines
+def linEval(p0, p1, t):
+    lVec = vDiff(p1, p0)
+    length = mod(lVec)
+    dist = t*length
+    uVec = unitV(lVec)
+
+    pt = vSum(p0, vPrd(uVec, dist))
+    return pt
