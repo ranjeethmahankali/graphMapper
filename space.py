@@ -7,12 +7,14 @@ import math
 
 # this is the 'wall' object
 class wall:
-    def __init__(self, startPt, endPt, drawColor = '#000000'):
+    def __init__(self, startPt, endPt, drawColor = '#000000', owner = None):
         self.start = startPt
         self.end = endPt
         self.color = drawColor
         # this is the list of all doors located on this wall
         self.doors = list()
+        self.owner = owner #this is the owner space of this wall
+        self.owner.walls.append(self)
     
     # this method draws the wall onto the provided PIl img - pending
     def render(self, img = Image.new("RGB", spaceSize, "white"), color=0):
@@ -160,14 +162,24 @@ class space(sg.cSpace):
                         job1['pt'].append(pt)
                     else:
                         job2['pt'].append(pt)
-                    
-            self.walls.append(wall(startPt, endPt))
+            
+            # this constructor automatically adds the wall to the self.walls list
+            newWall = wall(startPt, endPt, owner = self)
             split += [job1, job2]
             # print(len(job1['pt']), len(job2['pt']))
 
         self.makeWalls(split, new = False)
         return
         
+    # this method splits the created walls at every intersection and updates neighbour information
+    def splitWalls(self){
+        for w1 in self.walls:
+            for w2 in self.walls:
+                if(w1 != w2):
+                    intPt = pv.intersectionPt(w1.start,w1.end,w2.start,w2.end)
+                    # look at the intPt calue and decide which wall to split
+                    
+    }
     # this def renders the space into an image using PIL and returns that img
     def render(self, showPt = False):#showPt param decides whether to show pts or not - pending
         global colors
@@ -278,4 +290,5 @@ img = sample.render()
 
 # img = sample.walls[0].render()
 # img = sample.render()
+# img.save('sample.png')
 img.show()
