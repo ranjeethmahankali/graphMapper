@@ -172,14 +172,30 @@ class space(sg.cSpace):
         return
         
     # this method splits the created walls at every intersection and updates neighbour information
-    def splitWalls(self){
+    def splitWalls(self):
         for w1 in self.walls:
             for w2 in self.walls:
                 if(w1 != w2):
                     intPt = pv.intersectionPt(w1.start,w1.end,w2.start,w2.end)
-                    # look at the intPt calue and decide which wall to split
+                    # if intersection point is none then that means lines are parallel so we continue
+                    if intPt is None:
+                        continue
+                    # print(w1.start, intPt)
+                    val1 = min(pv.mod(pv.vDiff(w1.start, intPt)), pv.mod(pv.vDiff(w1.end, intPt)))
+                    val2 = min(pv.mod(pv.vDiff(w2.start, intPt)), pv.mod(pv.vDiff(w2.end, intPt)))
+                    if val1 == val2:
+                        continue
+                    # this is the wall to be split
+                    splitWall = w1 if (val1 > val2) else w2
+                    if val1 > val2:
+                        self.walls.remove(w1)
+                    else:
+                        self.walls.remove(w2)    
+                    # remove this wall from list and add two new smaller ones
                     
-    }
+                    split1 = wall(splitWall.start, intPt, owner = self)
+                    split2 = wall(intPt, splitWall.end, owner = self)
+                    
     # this def renders the space into an image using PIL and returns that img
     def render(self, showPt = False):#showPt param decides whether to show pts or not - pending
         global colors
@@ -278,6 +294,8 @@ sample = space('sample', nameList, coords)
     # export the training example
 sample.populatePts()
 sample.makeWalls()
+sample.splitWalls()
+print(len(sample.walls))
 
 # adding doors to test rendering
 for wall in sample.walls:
