@@ -49,7 +49,6 @@ def spaceWithID(spID):
 
 #This is the class for cSpace object
 class cSpace:
-
     #class initialization
     def __init__(self, name, parentSpace = None):
         self.label = name
@@ -636,7 +635,6 @@ def printRoute(route):
     return rtPrint
 
 class connection:
-
     def __init__(self, source, destination):
         self.fromSpace = source
         self.toSpace = destination
