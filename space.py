@@ -1,3 +1,4 @@
+import sys
 import spaceGraph as sg
 from ops import *
 from PIL import Image, ImageDraw
@@ -18,6 +19,9 @@ class wall:
         # this is the list of neighbors, should be of length no more than 2
         self.nbrs = list()
     
+    # this returns the length of the wall
+    def length(self):
+        return pv.mod(pv.vDiff(self.start, self.end))
     # this method draws the wall onto the provided PIl img - pending
     def render(self, img = Image.new("RGB", spaceSize, "white"), color=0):
         draw = ImageDraw.Draw(img)
@@ -26,15 +30,18 @@ class wall:
         return img
     # this wall updates the neighbors
     def updateNeighbors(self):
+        self.nbrs = list()
         midPt = pv.vPrd(pv.vSum(self.start, self.end), 0.5)
         ln = pv.unitV(pv.vDiff(self.end, self.start))
         step = pv.vRotate(ln, math.pi/2)
         pt1 = pv.vSum(midPt, step)
         pt2 = pv.vDiff(midPt, step)
 
+        test = False
         for label in self.owner.c:
             if self.owner.c[label].hasPoint(pt1) or self.owner.c[label].hasPoint(pt2):
                 self.nbrs.append(self.owner.c[label])
+                test = True
         
         # print('%s neighbors'%len(self.nbrs))
         
@@ -45,14 +52,20 @@ class wall:
 
 # this is the door class
 class door:
-    def __init__(self, parentWall, doorPos, doorSize = 4, doorColor=(255,255,255)):
+    def __init__(self, parentWall, doorPos, doorSize = 1, doorColor=(255,255,255)):
         self.size = abs(doorSize)
         self.wall = parentWall
+        if self.wall.length() < self.size+3:# exiting because the wall is too small
+            del self
+            return
         parentWall.doors.append(self)
         # this is the parameter between 0 and 1 representing the position of door on the line
         self.pos = doorPos
         # this color will be used to render the door
         self.color = doorColor
+        
+        # print(len(self.wall.nbrs))
+        self.wall.owner.connectChildren(self.wall.nbrs[0].label, self.wall.nbrs[1].label)
     
     def render(self, img):
         draw = ImageDraw.Draw(img)
@@ -98,8 +111,9 @@ class space(sg.cSpace):
         self.walls = list()
         # shuffling the names just before making them a property so that they come out different
         # everytime, more diversity in the dataset
-        random.shuffle(childNames)
-        self.childNames = childNames
+        self.childNames = childNames[:]
+        random.shuffle(self.childNames)
+        # print(self.childNames)
     
     # this function will return the value for the orientation depending on the dimensions - dims param
     def getOrientation(self,dims):
@@ -149,6 +163,7 @@ class space(sg.cSpace):
             return
         if len(job['pt']) == 1:#nothing to divide
             #create space and add as a child to this space
+            # print('here2')
             newSpace = space(self.childNames.pop(),[], job, self)
         else:
             wallPt = pv.meanVec(job['pt'])
@@ -159,6 +174,7 @@ class space(sg.cSpace):
             job1 = None
             job2 = None
             if orn == 0:
+                # print('x')
                 #do sth for landscape
                 startPt = [wallPt[0], job['y0']]
                 endPt = [wallPt[0], job['y1']]
@@ -172,6 +188,7 @@ class space(sg.cSpace):
                     else:
                         job2['pt'].append(pt)
             elif orn == 1:
+                # print('y')
                 # do sth for portrait
                 startPt = [job['x0'], wallPt[1]]
                 endPt = [job['x1'], wallPt[1]]
@@ -187,8 +204,15 @@ class space(sg.cSpace):
             
             # this constructor automatically adds the wall to the self.walls list
             newWall = wall(startPt, endPt, owner = self)
+            
+            if len(job1['pt']) == 2 and len(job2['pt']) == 0:
+                job2['pt'].append(job1['pt'].pop())
+            elif len(job2['pt']) == 2 and len(job1['pt']) == 0:
+                job1['pt'].append(job2['pt'].pop())
+
             split += [job1, job2]
             # print(len(job1['pt']), len(job2['pt']))
+            # print(job1['pt'], job2['pt'])
 
         self.makeWalls(split, new = False)
         return
@@ -243,6 +267,28 @@ class space(sg.cSpace):
         for w in self.walls:
             w.updateNeighbors()
                     
+    # this randomly populates the walls with doors
+    def makeRandDoors(self):
+        for w in self.walls:
+            if len(w.nbrs) < 2:
+                continue
+            # this is the range to make random decision
+            dec = [0.3, 0.5]
+            if random.uniform(0,1) > random.uniform(dec[0], dec[1]):
+                d = door(w, random.uniform(0,1))
+    # this returns the flat version of the graph of it's children's connection
+    def getFlatGraph(self):
+        num = len(nameList)
+        maxCon = int(num*(num-1)*0.5)
+        flatGraph = [0]*maxCon
+        # print(len(flatGraph))
+        for i in range(len(flatGraph)):
+            j, k = self.getConSpaces(i)
+            if self.c[nameList[j]].isConnected(self.c[nameList[k]]):
+                flatGraph[i] = 1
+        
+        return flatGraph
+
     # this def renders the space into an image using PIL and returns that img
     def render(self, showPt = False):#showPt param decides whether to show pts or not - pending
         global colors
@@ -283,10 +329,10 @@ class space(sg.cSpace):
         return
     # #returns the indices of the two spaces corresponding to the connection number
     def getConSpaces(self, num):
-        numSpace = len(self.childNames)
-        possibleConnections = numSpace*(numSpace-1)/2
+        numSpace = len(nameList)
+        possibleConnections = int(numSpace*(numSpace-1)/2)
         if num > possibleConnections - 1:
-            print('The connection index exceeds the total possible connections')
+            print('flatgraph index too high. %s > %s'%(num, possibleConnections))
             return None
 
         s1 = None
@@ -310,7 +356,7 @@ class space(sg.cSpace):
 
     #returns the index of te connection between the two spaces, whose indices are supplied as parameters.
     def getConIndex(self, sA,sB):
-        numSpace = len(self.childNames)
+        numSpace = len(nameList)
         if sA >= numSpace or sB >= numSpace:
             print('Invalid space indices')
             return None
@@ -332,28 +378,21 @@ class space(sg.cSpace):
 # the main logic begins here
 # this is the space list for the dataset
 
-coords = {'pt':[], 'x0':0,'x1':64,'y0':0,'y1':48}
-sample = space('sample', nameList, coords)
+coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 
-# for i in range(dataNum):
-    # populate sample with pts
-    # make walls
-    # export the training example
-sample.populatePts()
-sample.makeWalls()
-sample.splitWalls()
-# print(len(sample.walls))
+for i in range(100):
+    sample = space('sample', nameList, coords)
+    sample.populatePts()
+    sample.makeWalls()
+    sys.stdout.write('%s examples generated\r'%(i+1))
+    sample.splitWalls()
+    sample.makeRandDoors()
 
-# adding doors to test rendering
-# for wall in sample.walls:
-#     dr = door(wall, 0.2)
-    # print(len(wall.doors), wall.doors[-1])
+    img = sample.render()
+    img.save('data/%s.png'%i)
 
-img = sample.render()
-# for w in sample.walls:
-#     print(w)
+print('\n%s'%('-'*25))
 
-# img = sample.walls[0].render()
-# img = sample.render()
-# img.save('sample.png')
-img.show()
+# sample.printSpace()
+# print(sample.getFlatGraph())
+# img.show()
