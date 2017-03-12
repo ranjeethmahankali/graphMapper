@@ -61,7 +61,14 @@ def vSum(vec1, vec2):
 def vDiff(vec1, vec2):
     return [vec1[0]-vec2[0], vec1[1]-vec2[1]]
 
-#returns the unit vector parallel to the given vector
+# returns a vecctor rotate by angle
+def vRotate(vec, angle):
+    vr = [None, None]
+    vr[0] = vec[0]*math.cos(angle) - vec[1]*math.sin(angle)
+    vr[1] = vec[0]*math.sin(angle) + vec[1]*math.cos(angle)
+
+    return vr
+# returns the unit vector parallel to the given vector
 def unitV(vec):
     length = mod(vec)
     if length == 0:
