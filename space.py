@@ -15,6 +15,8 @@ class wall:
         self.doors = list()
         self.owner = owner #this is the owner space of this wall
         self.owner.walls.append(self)
+        # this is the list of neighbors, should be of length no more than 2
+        self.nbrs = list()
     
     # this method draws the wall onto the provided PIl img - pending
     def render(self, img = Image.new("RGB", spaceSize, "white"), color=0):
@@ -22,6 +24,20 @@ class wall:
         draw.line(self.start + self.end, fill = color)
         del draw
         return img
+    # this wall updates the neighbors
+    def updateNeighbors(self):
+        midPt = pv.vPrd(pv.vSum(self.start, self.end), 0.5)
+        ln = pv.unitV(pv.vDiff(self.end, self.start))
+        step = pv.vRotate(ln, math.pi/2)
+        pt1 = pv.vSum(midPt, step)
+        pt2 = pv.vDiff(midPt, step)
+
+        for label in self.owner.c:
+            if self.owner.c[label].hasPoint(pt1) or self.owner.c[label].hasPoint(pt2):
+                self.nbrs.append(self.owner.c[label])
+        
+        # print('%s neighbors'%len(self.nbrs))
+        
     # this is the default string parsing
     def __str__(self):
         return "[%s, %s]"%(self.start, self.end)
@@ -103,8 +119,14 @@ class space(sg.cSpace):
             
         return
 
-    # this function will calculate the positions of the walls
-    # write this func and call it in a loop while creating the dataset
+    # this function returns if this space has a point inside it or not
+    def hasPoint(self, pt):
+        if (self.coord['x0']< pt[0] <self.coord['x1']) or (self.coord['x1']< pt[0] <self.coord['x0']):
+            if (self.coord['y0']< pt[1] <self.coord['y1']) or (self.coord['y1']< pt[1] <self.coord['y0']):
+                return True
+        
+        return False
+    # this function will calculate the positions of the walls and adds them to the walls list
     def makeWalls(self, split = None, new=True):
         # split is a list of jobs to do. Each job is a set of points and the x,y limits of the space
         # they occupy. The job needs to be popped from the list, then points need to be split with a
@@ -171,7 +193,7 @@ class space(sg.cSpace):
         self.makeWalls(split, new = False)
         return
         
-    # this method splits the created walls at every intersection and updates neighbour information
+    # this method splits the created walls at every intersection and also updates neighbor info
     def splitWalls(self):
         newWallList = list()
         # this nested def splits the wall w1 at the intersection point intPt
@@ -192,7 +214,7 @@ class space(sg.cSpace):
         while len(self.walls) > 0:
             # print('walls: %s %s'%(len(self.walls), len(newWallList)))
             w1 = self.walls.pop()
-            print('walls: %s %s'%(len(self.walls), len(newWallList)))
+            # print('walls: %s %s'%(len(self.walls), len(newWallList)))
             splitFirst = -1
             splitSecond = -1
             for w2 in self.walls:
@@ -217,6 +239,9 @@ class space(sg.cSpace):
         # finally updating the walls with new walls
         # print(len(newWallList))
         self.walls = newWallList
+        # updaitng neighbor information
+        for w in self.walls:
+            w.updateNeighbors()
                     
     # this def renders the space into an image using PIL and returns that img
     def render(self, showPt = False):#showPt param decides whether to show pts or not - pending
