@@ -380,18 +380,38 @@ class space(sg.cSpace):
 
 coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 
-for i in range(100):
-    sample = space('sample', nameList, coords)
-    sample.populatePts()
-    sample.makeWalls()
-    sys.stdout.write('%s examples generated\r'%(i+1))
-    sample.splitWalls()
-    sample.makeRandDoors()
+dataDir = 'data/'
 
-    img = sample.render()
-    img.save('data/%s.png'%i)
+for n in range(10):
+    im_data = list()
+    graph_data = list()
+    i = 0
+    while i < 500:
+        sample = space('sample', nameList, coords)
+        sample.populatePts()
+        sample.makeWalls()
+        if len(sample.c) < 5:
+            # this is when 3 or more points lie on the walls and
+            # mess everything up, we just ignore and repeat since
+            # this is a rare random occurence
+            continue
+        sample.splitWalls()
+        sample.makeRandDoors()
 
-print('\n%s'%('-'*25))
+        img = sample.render()
+        im_arr = prepareImage(img)
+        flat_graph = sample.getFlatGraph()
+
+        im_data.append(im_arr)
+        graph_data.append(flat_graph)
+        sys.stdout.write('%s examples generated\r'%(i+1))
+        
+        i += 1
+
+    savePath = dataDir+str(n)+'.pkl'
+    writeToFile([im_data, graph_data], savePath)
+    print('\nSaved to %s'%savePath)
+    print('%s'%('-'*25))
 
 # sample.printSpace()
 # print(sample.getFlatGraph())
