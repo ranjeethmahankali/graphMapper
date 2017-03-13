@@ -10,7 +10,7 @@ accuracy = accuracy(graph, target)
 data = dataset('data/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    # loadModel(sess, model_save_path[0])
+    loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
     cycles = 50000
