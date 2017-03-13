@@ -87,7 +87,6 @@ def prepareImages(fileList):
 # this one prepares a single image and returns it as an array
 def prepareImage(img):
     arr = np.array(img)
-    arr = np.expand_dims(arr, 0)
     arr = arr.astype(np.float32)
     arr /= 255
 
@@ -165,16 +164,16 @@ class dataset:
             if not silent: print('\nLoading data from %s...'%self.curFile)
             dSet = pickle.load(inp)
         
-        # self.data = [np.expand_dims(np.array(dSet[0]),3), np.expand_dims(np.array(dSet[1]), 4)]
-        self.data = dSet
+        self.data = [np.array(dSet[0]), np.array(dSet[1])]
+        # self.data = dSet
         
         if self.test_data is None:
             with open(self.dirPath + self.testFileName,'rb') as inp:
                 if not silent: print('\nLoading test data from %s...'%self.testFileName)
                 dSet = pickle.load(inp)
             
-            # self.test_data = [np.expand_dims(np.array(dSet[0]),3), np.expand_dims(np.array(dSet[1]), 4)]
-            self.test_data = dSet
+            self.test_data = [np.array(dSet[0]), np.array(dSet[1])]
+            # self.test_data = dSet
     
     # this returns the next batch of the size - size
     def next_batch(self, size):

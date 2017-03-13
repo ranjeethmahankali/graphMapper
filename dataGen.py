@@ -382,11 +382,11 @@ coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 
 dataDir = 'data/'
 
-for n in range(10):
+for n in range(1):
     im_data = list()
     graph_data = list()
     i = 0
-    while i < 500:
+    while i < 1000:
         sample = space('sample', nameList, coords)
         sample.populatePts()
         sample.makeWalls()
