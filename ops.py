@@ -80,14 +80,14 @@ def prepareImages(fileList):
     batch = []
     for fileName in fileList:
         img = Image.open(fileName).convert("L")
-        arr prepareImage(img)
+        arr = prepareImage(img)
         batch.append(arr)
     return np.array(batch)
 
 # this one prepares a single image and returns it as an array
 def prepareImage(img):
     arr = np.array(img)
-    arr = np.expand_dims(arr, 2)
+    arr = np.expand_dims(arr, 0)
     arr = arr.astype(np.float32)
     arr /= 255
 
@@ -229,24 +229,9 @@ class dataset:
         
         return batch
 
-# this method converts the np arrays back into normal lists to be used in rhinopython
-def voxToRhino(vox_np_data):
-    vox = vox_np_data.squeeze(axis=4).tolist()
-    return vox
-# This method saves a batch of results as images and vox lists to compare
-def saveResults(batch, fileName='vox.pkl', version = 2, saveImages = True):
-    # batch is a list of len 2 batch[0] is the images and batch[1] is the voxels
-    # now convertiing the voxels for rhino and pickling them
-    vox = voxToRhino(batch[1])
-    with open(resDir+fileName, 'wb') as output:
-        pickle.dump(vox, output, protocol = version)
-    
-    if saveImages:
-        imgNum = batch[0].shape[0]
-        for i in range(imgNum):
-            img  = toImage(batch[0][i:i+1])
-            img.save(resDir+'%s.png'%i)
-    
-    print(' ... results saved')
+# this just saves any given data to any given path
+def writeToFile(data, path):
+    with open(path, 'wb') as output:
+        pickle.dump(data, output, pickle.HIGHEST_PROTOCOL)
 # from here down is the sandbox place to check and verify the code above before using it in
 # the other files
