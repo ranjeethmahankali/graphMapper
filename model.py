@@ -68,8 +68,8 @@ def getGraph(vector):
 
 # this method returns the loss tensor
 def loss(vector, graph_true):
-    # return tf.nn.sigmoid_cross_entropy_with_logits(vector, graph_true)
-    return tf.reduce_sum(tf.square(graph_true - vector))
+    return tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(vector, graph_true))
+    # return tf.reduce_sum(tf.square(graph_true - vector))
 
 # this function returns the accuracy tensor
 def accuracy(graph, graph_true):
