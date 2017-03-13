@@ -42,7 +42,7 @@ with tf.Session() as sess:
                 
                 # tracker helps to compare the data being printed to previous run with same 
                 # training examples
-                tracker = i%(1000/batch_size)
+                tracker = (i/testStep)%(1000/batch_size)
                 print('%02d Accuracy: %.2f; Loss: %.2f%s'%(tracker, acc, lval,' '*50))
         
         # now saving the trained model every 1500 cycles
