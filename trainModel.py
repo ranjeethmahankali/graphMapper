@@ -6,6 +6,7 @@ vector = interpret(image)
 optim = getOptimStep(vector, target)
 graph = getGraph(vector)
 accuracy = accuracy(graph, target)
+lossVal = loss(vector, target)
 
 data = dataset('data/')
 with tf.Session() as sess:
@@ -34,12 +35,13 @@ with tf.Session() as sess:
 
             if i % testStep == 0:
                 testBatch = data.test_batch(batch_size)
-                acc = sess.run(accuracy, feed_dict={
+                acc, lf = sess.run([accuracy, lossVal], feed_dict={
                     image: testBatch[0],
                     target: testBatch[1]
                 })
-
-                print('Accuracy: %.2f%s'%(acc,' '*70))
+                
+                tracker = (i%1000)/50
+                print('%02d Accuracy: %.2f; Loss: %.2f%s'%(tracker, acc, lf,' '*50))
         
         # now saving the trained model every 1500 cycles
             if i % saveStep == 0 and i != 0:
