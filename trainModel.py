@@ -11,7 +11,7 @@ lossVal = loss(vector, target)
 data = dataset('data/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    loadModel(sess, model_save_path[0])
+    # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
     cycles = 50000
@@ -35,13 +35,13 @@ with tf.Session() as sess:
 
             if i % testStep == 0:
                 testBatch = data.test_batch(batch_size)
-                acc, lf = sess.run([accuracy, lossVal], feed_dict={
+                acc, lval = sess.run([accuracy, lossVal], feed_dict={
                     image: testBatch[0],
                     target: testBatch[1]
                 })
                 
                 tracker = (i%1000)/50
-                print('%02d Accuracy: %.2f; Loss: %.2f%s'%(tracker, acc, lf,' '*50))
+                print('%02d Accuracy: %.2f; Loss: %.2f%s'%(tracker, acc, lval,' '*50))
         
         # now saving the trained model every 1500 cycles
             if i % saveStep == 0 and i != 0:
