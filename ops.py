@@ -10,7 +10,7 @@ from PIL import Image
 # imgSize = [96,128]
 imgSize = [64,48]
 spaceSize = [64,48]
-batch_size = 5
+batch_size = 50
 # resDir = 'results/'
 resDir = 'results/'
 learning_rate = 1e-4

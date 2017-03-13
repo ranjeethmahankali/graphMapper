@@ -14,7 +14,7 @@ with tf.Session() as sess:
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 50000
+    cycles = 4000
     testStep = 50
     saveStep = 2000
     startTime = time.time()
@@ -40,7 +40,7 @@ with tf.Session() as sess:
                     target: testBatch[1]
                 })
                 
-                tracker = (i%1000)/50
+                tracker = (i%(5000/batch_size))/50
                 print('%02d Accuracy: %.2f; Loss: %.2f%s'%(tracker, acc, lval,' '*50))
         
         # now saving the trained model every 1500 cycles
