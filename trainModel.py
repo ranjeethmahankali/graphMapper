@@ -2,8 +2,8 @@ from model import *
 import sys
 from ops import *
 
-image, target = getPlaceHolders()
-vector = interpret(image)
+image, target, keep_prob = getPlaceHolders()
+vector = interpret(image, keep_prob)
 optim = getOptimStep(vector, target)
 graph = getGraph(vector)
 accuracy = accuracy(graph, target)
@@ -15,7 +15,7 @@ with tf.Session() as sess:
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 8000
+    cycles = 20000
     testStep = 50
     saveStep = 2000
     startTime = time.time()
@@ -24,7 +24,8 @@ with tf.Session() as sess:
             batch = data.next_batch(batch_size)
             _ = sess.run(optim, feed_dict={
                 image: batch[0],
-                target: batch[1]
+                target: batch[1],
+                keep_prob:0.5
             })
 
             timer = estimate_time(startTime, cycles, i)
@@ -36,9 +37,10 @@ with tf.Session() as sess:
 
             if i % testStep == 0:
                 testBatch = data.test_batch(batch_size)
-                acc, lval, graph_out = sess.run([accuracy, lossVal, graph], feed_dict={
+                acc, lval, graph_out, vec = sess.run([accuracy, lossVal, graph, vector], feed_dict={
                     image: testBatch[0],
-                    target: testBatch[1]
+                    target: testBatch[1],
+                    keep_prob:1.0
                 })
                 
                 g_sum = int(np.sum(graph_out))
@@ -46,6 +48,8 @@ with tf.Session() as sess:
                 # tracker helps to compare the data being printed to previous run with same 
                 # training examples
                 tracker = (i/testStep)%(1000/batch_size)
+                # print(testBatch[0][0])
+                print(graph_out[0], testBatch[1][0])
                 print('%02d Acc: %.2f; L: %.2f; Sums: %s/%s%s'%(tracker, acc, lval,g_sum,t_sum,' '*40))
         
         # now saving the trained model every 1500 cycles

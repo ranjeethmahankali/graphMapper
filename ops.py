@@ -10,10 +10,10 @@ from PIL import Image
 # imgSize = [96,128]
 imgSize = [64,48]
 spaceSize = [64,48]
-batch_size = 50
+batch_size = 20
 # resDir = 'results/'
 resDir = 'results/'
-learning_rate = 1e-4
+learning_rate = 1e-6
 model_save_path = ['savedModels/model_1.ckpt',
                     'savedModels/model_2.ckpt']
 
