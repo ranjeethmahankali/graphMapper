@@ -12,7 +12,7 @@ lossVal = loss(vector, target)
 data = dataset('data/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    loadModel(sess, model_save_path[0])
+    # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
     cycles = 40000
@@ -49,7 +49,7 @@ with tf.Session() as sess:
                 # training examples
                 tracker = (i/testStep)%(1000/batch_size)
                 # print(testBatch[0][0])
-                print(graph_out[0], testBatch[1][0])
+                # print(vec[0], testBatch[1][0])
                 print('%02d Acc: %.2f; L: %.2f; Sums: %s/%s%s'%(tracker, acc, lval,g_sum,t_sum,' '*40))
         
         # now saving the trained model every 1500 cycles

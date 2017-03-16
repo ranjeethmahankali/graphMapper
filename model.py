@@ -49,17 +49,17 @@ def getPlaceHolders():
 
 # this interprets the image and returns the tensor corresponding to a flattened graph
 def interpret(image, keep_prob):
-    h0 = tf.nn.relu(conv2d(image, wc1) + bc1)
-    h1 = tf.nn.relu(conv2d(h0, wc2) + bc2)
-    h2 = tf.nn.relu(conv2d(h1, wc3) + bc3)
-    h3 = tf.nn.relu(conv2d(h2, wc4) + bc4)
+    h0 = tf.nn.sigmoid(conv2d(image, wc1) + bc1)
+    h1 = tf.nn.sigmoid(conv2d(h0, wc2) + bc2)
+    h2 = tf.nn.sigmoid(conv2d(h1, wc3) + bc3)
+    h3 = tf.nn.sigmoid(conv2d(h2, wc4) + bc4)
     
     h3_flat = tf.reshape(h3, [-1, 3072])
     
-    f0 = tf.nn.relu(tf.matmul(h3_flat, wf1) + bf1)
-    f1 = tf.nn.relu(tf.matmul(f0, wf2) + bf2)
+    f0 = tf.nn.sigmoid(tf.matmul(h3_flat, wf1) + bf1)
+    f1 = tf.nn.sigmoid(tf.matmul(f0, wf2) + bf2)
     f1_drop = tf.nn.dropout(f1, keep_prob)
-    f2 = tf.nn.relu(tf.matmul(f1_drop, wf3) + bf3)
+    f2 = tf.nn.sigmoid(tf.matmul(f1_drop, wf3) + bf3)
     f3 = tf.nn.sigmoid(tf.matmul(f2, wf4) + bf4)
 
     # f3 is th predicted vector which has floating point numbers
@@ -67,7 +67,8 @@ def interpret(image, keep_prob):
 
 def getGraph(vector):
     offset = tf.abs(vector - 0.1)
-    return tf.floor(2*offset)
+    # return tf.floor(2*offset)
+    return tf.floor(2 * vector)
 
 # this method returns the loss tensor
 def loss(vector, graph_true):
