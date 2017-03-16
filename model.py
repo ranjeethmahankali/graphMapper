@@ -87,7 +87,7 @@ def loss(vector, graph_true):
     error_ones = tf.reduce_mean(tf.mul(absDiff, maskZeros))
     error_zeros = tf.reduce_mean(tf.mul(absDiff, maskOnes))
 
-    error = (t*error_zeros) + ((1-t)*error_ones)# + tf.abs(graph_sum - target_sum)
+    error = (t*error_zeros) + ((1-t)*error_ones) + tf.abs(graph_sum - target_sum)
 
     return error
 
