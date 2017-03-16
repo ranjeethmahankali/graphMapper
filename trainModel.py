@@ -12,10 +12,10 @@ lossVal = loss(vector, target)
 data = dataset('data/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    # loadModel(sess, model_save_path[0])
+    loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 20000
+    cycles = 40000
     testStep = 50
     saveStep = 2000
     startTime = time.time()
