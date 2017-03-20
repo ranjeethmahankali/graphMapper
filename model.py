@@ -3,16 +3,16 @@ from ops import *
 import tensorflow as tf
 
 with tf.variable_scope('vars'):
-    wc1 = weightVariable([5,5,3,16], 'wc1')
-    bc1 = biasVariable([16],'bc1')
-    wc2 = weightVariable([5,5,16,32], 'wc2')
-    bc2 = biasVariable([32],'bc2')
-    wc3 = weightVariable([5,5,32,64],'wc3')
-    bc3=  biasVariable([64],'bc3')
-    wc4 = weightVariable([5,5,64,256],'wc4')
-    bc4 =  biasVariable([256],'bc4')
+    wc1 = weightVariable([5,5,3,64], 'wc1')
+    bc1 = biasVariable([64],'bc1')
+    wc2 = weightVariable([5,5,64,128], 'wc2')
+    bc2 = biasVariable([128],'bc2')
+    wc3 = weightVariable([5,5,128,256],'wc3')
+    bc3=  biasVariable([256],'bc3')
+    wc4 = weightVariable([5,5,256,512],'wc4')
+    bc4 =  biasVariable([512],'bc4')
 
-    wf1 = weightVariable([3072, 8192], 'wf1')
+    wf1 = weightVariable([6144, 8192], 'wf1')
     bf1 = biasVariable([8192], 'bf1')
     wf2 = weightVariable([8192, 4096], 'wf2')
     bf2 = biasVariable([4096], 'bf2')
@@ -25,13 +25,13 @@ with tf.variable_scope('vars'):
 # model scratch pad
 # starting with a three channel image of 3 channels
 # [None, 48,64,3] - image
-# [None, 24, 32, 16] - h0
-# [None, 12, 16, 32] - h1
-# [None, 6, 8, 64] - h2
-# [None, 3, 4, 256] - h3
+# [None, 24, 32, 64] - h0
+# [None, 12, 16, 128] - h1
+# [None, 6, 8, 256] - h2
+# [None, 3, 4, 512] - h3
 
 # we then flatten h3
-# [None, 3072] - h3_flat
+# [None, 6144] - h3_flat
 # [None, 8192] - f0
 # [None, 4096] - f1
 # [None, 2048] - f2
@@ -54,12 +54,11 @@ def interpret(image, keep_prob):
     h2 = tf.nn.sigmoid(conv2d(h1, wc3) + bc3)
     h3 = tf.nn.sigmoid(conv2d(h2, wc4) + bc4)
     
-    h3_flat = tf.reshape(h3, [-1, 3072])
-    
+    h3_flat = tf.reshape(h3, [-1, 6144])
     f0 = tf.nn.sigmoid(tf.matmul(h3_flat, wf1) + bf1)
-    f1 = tf.nn.sigmoid(tf.matmul(f0, wf2) + bf2)
-    f1_drop = tf.nn.dropout(f1, keep_prob)
-    f2 = tf.nn.sigmoid(tf.matmul(f1_drop, wf3) + bf3)
+    f0_drop = tf.nn.dropout(f0, keep_prob)
+    f1 = tf.nn.sigmoid(tf.matmul(f0_drop, wf2) + bf2)
+    f2 = tf.nn.sigmoid(tf.matmul(f1, wf3) + bf3)
     f3 = tf.nn.sigmoid(tf.matmul(f2, wf4) + bf4)
 
     # f3 is th predicted vector which has floating point numbers
