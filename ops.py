@@ -62,6 +62,10 @@ def biasVariable(shape, name):
 def conv2d(x, W, strides = [1,2,2,1]):
     return tf.nn.conv2d(x, W, strides=strides, padding='SAME')
 
+# 3d convolutional layer
+def conv3d(x, W, strides = [1,2,2,1,1]):
+    return tf.nn.conv3d(x,W,strides = strides, padding='SAME')
+
 # deconv layer
 def deConv3d(y, w, outShape, strides=[1,2,2,2,1]):
     return tf.nn.conv3d_transpose(y, w, output_shape = outShape, strides=strides, padding='SAME')
@@ -164,7 +168,7 @@ class dataset:
             if not silent: print('\nLoading data from %s...'%self.curFile)
             dSet = pickle.load(inp)
         
-        self.data = [np.array(dSet[0]), np.array(dSet[1])]
+        self.data = [np.expand_dims(np.array(dSet[0]),4), np.array(dSet[1])]
         # self.data = dSet
         
         if self.test_data is None:
@@ -172,7 +176,7 @@ class dataset:
                 if not silent: print('\nLoading test data from %s...'%self.testFileName)
                 dSet = pickle.load(inp)
             
-            self.test_data = [np.array(dSet[0]), np.array(dSet[1])]
+            self.test_data = [np.expand_dims(np.array(dSet[0]),4), np.array(dSet[1])]
             # self.test_data = dSet
     
     # this returns the next batch of the size - size

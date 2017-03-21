@@ -3,26 +3,44 @@ from ops import *
 import tensorflow as tf
 
 with tf.variable_scope('vars'):
-    wf1 = weightVariable([9216, 8192], 'wf1')
-    bf1 = biasVariable([8192], 'bf1')
-    wf2 = weightVariable([8192, 6400], 'wf2')
-    bf2 = biasVariable([6400], 'bf2')
-    wf3 = weightVariable([6400, 4096], 'wf3')
-    bf3 = biasVariable([4096],'bf3')
-    wf4 = weightVariable([4096, 2048], 'wf4')
-    bf4 = biasVariable([2048], 'bf4')
-    wf5 = weightVariable([2048, 1024], 'wf5')
-    bf5 = biasVariable([1024], 'bf5')
-    wf6 = weightVariable([1024, 512],'wf6')
-    bf6 = biasVariable([512],'bf6')
-    wf7 = weightVariable([512, 10], 'wf7')
-    bf7 = biasVariable([10], 'bf7')
+    wc1 = weightVariable([5,5,3, 1,16],'wc1')
+    bc1 = biasVariable([16], 'bc1')
+
+    wc2 = weightVariable([5,5,3, 16,32],'wc2')
+    bc2 = biasVariable([32], 'bc2')
+    
+    wc3 = weightVariable([5,5,3, 32,48],'wc3')
+    bc3 = biasVariable([48], 'bc3')
+    
+    wc4 = weightVariable([5,5,3, 48,64],'wc4')
+    bc4 = biasVariable([64], 'bc4')
+
+    wf1 = weightVariable([2304, 4096], 'wf1')
+    bf1 = biasVariable([4096], 'bf1')
+
+    wf2 = weightVariable([4096, 8192], 'wf2')
+    bf2 = biasVariable([8192], 'bf2')
+
+    wf3 = weightVariable([8192, 10], 'wf3')
+    bf3 = biasVariable([10], 'bf3')
+
+# model scratchpad
+# [-1, 48, 64, 3, 1] - image
+# [-1, 24, 32, 3, 16] - h1
+# [-1, 12, 16, 3, 32] - h2
+# [-1, 6, 8, 3, 48] - h3
+# [-1, 3, 4, 3, 64] - h4
+
+# [-1, 2304] - h4_flat
+# [-1, 4096] - f1
+# [-1, 8192] - f2
+# [-1, 10] - f3 - flat graph to be returned
 
 # this function returns the placeholders for inputs and targets
 def getPlaceHolders():
     # the imgSize list is flipped because height and width of image are flipped when
     # converted into a numpy array
-    image = tf.placeholder(tf.float32, shape=[None, imgSize[1], imgSize[0], 3])
+    image = tf.placeholder(tf.float32, shape=[None, imgSize[1], imgSize[0], 3, 1])
     graph_target = tf.placeholder(tf.float32, shape=[None, 10])
     keep_prob = tf.placeholder(tf.float32)
 
@@ -30,20 +48,21 @@ def getPlaceHolders():
 
 # this interprets the image and returns the tensor corresponding to a flattened graph
 def interpret(image, keep_prob):
-    im_flat = tf.reshape(image, [-1, 9216])
+    h1 = tf.nn.sigmoid(conv3d(image, wc1) + bc1)
+    h2 = tf.nn.sigmoid(conv3d(h1, wc2) + bc2)
+    h3 = tf.nn.sigmoid(conv3d(h2, wc3) + bc3)
+    h4 = tf.nn.sigmoid(conv3d(h3, wc4) + bc4)
 
-    h1 = tf.nn.sigmoid(tf.matmul(im_flat, wf1) + bf1)
-    h2 = tf.nn.sigmoid(tf.matmul(h1, wf2) + bf2)
-    h3 = tf.nn.sigmoid(tf.matmul(h2, wf3) + bf3)
-    h4 = tf.nn.sigmoid(tf.matmul(h3, wf4) + bf4)
-    h5 = tf.nn.sigmoid(tf.matmul(h4, wf5) + bf5)
+    h4_flat = tf.reshape(h4, [-1, 2304])
+    
+    f1 = tf.nn.sigmoid(tf.matmul(h4_flat, wf1) + bf1)
 
-    h5_drop = tf.nn.dropout(h5, keep_prob)
+    f1_drop = tf.nn.dropout(f1, keep_prob)
 
-    h6 = tf.nn.sigmoid(tf.matmul(h5_drop, wf6) + bf6)
-    h7 = tf.nn.sigmoid(tf.matmul(h6, wf7) + bf7)
+    f2 = tf.nn.sigmoid(tf.matmul(f1_drop, wf2) + bf2)
+    f3 = tf.nn.sigmoid(tf.matmul(f2, wf3) + bf3)
 
-    return h7
+    return f3
 
 def getGraph(vector):
     offset = tf.abs(vector - 0.1)
