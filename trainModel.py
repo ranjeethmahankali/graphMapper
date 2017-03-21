@@ -15,9 +15,9 @@ with tf.Session() as sess:
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 40000
+    cycles = 10000
     testStep = 50
-    saveStep = 2000
+    saveStep = 1000
     startTime = time.time()
     try:
         for i in range(cycles):
