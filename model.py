@@ -48,18 +48,18 @@ def getPlaceHolders():
 
 # this interprets the image and returns the tensor corresponding to a flattened graph
 def interpret(image, keep_prob):
-    h1 = tf.nn.sigmoid(conv3d(image, wc1) + bc1)
-    h2 = tf.nn.sigmoid(conv3d(h1, wc2) + bc2)
-    h3 = tf.nn.sigmoid(conv3d(h2, wc3) + bc3)
-    h4 = tf.nn.sigmoid(conv3d(h3, wc4) + bc4)
+    h1 = tf.nn.relu(conv3d(image, wc1) + bc1)
+    h2 = tf.nn.relu(conv3d(h1, wc2) + bc2)
+    h3 = tf.nn.relu(conv3d(h2, wc3) + bc3)
+    h4 = tf.nn.relu(conv3d(h3, wc4) + bc4)
 
     h4_flat = tf.reshape(h4, [-1, 2304])
     
-    f1 = tf.nn.sigmoid(tf.matmul(h4_flat, wf1) + bf1)
+    f1 = tf.nn.relu(tf.matmul(h4_flat, wf1) + bf1)
 
     f1_drop = tf.nn.dropout(f1, keep_prob)
 
-    f2 = tf.nn.sigmoid(tf.matmul(f1_drop, wf2) + bf2)
+    f2 = tf.nn.relu(tf.matmul(f1_drop, wf2) + bf2)
     f3 = tf.nn.sigmoid(tf.matmul(f2, wf3) + bf3)
 
     return f3
@@ -72,23 +72,23 @@ def getGraph(vector):
 # this method returns the loss tensor
 def loss(vector, graph_true):
     # return tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(vector, graph_true))
-    # return tf.reduce_mean(tf.square(graph_true - vector))
-    graph = getGraph(vector)
-    target_sum = tf.reduce_sum(graph_true)
-    graph_sum = tf.reduce_sum(vector)
-    absDiff = 4*tf.abs(vector - graph_true)
+    return tf.reduce_sum(tf.square(graph_true - vector))
+    # graph = getGraph(vector)
+    # target_sum = tf.reduce_sum(graph_true)
+    # graph_sum = tf.reduce_sum(vector)
+    # absDiff = 4*tf.abs(vector - graph_true)
 
-    t = tf.nn.sigmoid(graph_sum - target_sum)
+    # t = tf.nn.sigmoid(graph_sum - target_sum)
 
-    maskZeros = graph_true
-    maskOnes = 1 - graph_true
+    # maskZeros = graph_true
+    # maskOnes = 1 - graph_true
 
-    error_ones = tf.reduce_mean(tf.mul(absDiff, maskZeros))
-    error_zeros = tf.reduce_mean(tf.mul(absDiff, maskOnes))
+    # error_ones = tf.reduce_mean(tf.mul(absDiff, maskZeros))
+    # error_zeros = tf.reduce_mean(tf.mul(absDiff, maskOnes))
 
-    error = (t*error_zeros) + ((1-t)*error_ones) + tf.abs(graph_sum - target_sum)/20
+    # error = (t*error_zeros) + ((1-t)*error_ones) + tf.abs(graph_sum - target_sum)/20
 
-    return error
+    # return error
 
 # this function returns the accuracy tensor
 def accuracy(graph, graph_true):
