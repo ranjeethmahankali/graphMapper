@@ -3,39 +3,20 @@ from ops import *
 import tensorflow as tf
 
 with tf.variable_scope('vars'):
-    wc1 = weightVariable([5,5,3,64], 'wc1')
-    bc1 = biasVariable([64],'bc1')
-    wc2 = weightVariable([5,5,64,128], 'wc2')
-    bc2 = biasVariable([128],'bc2')
-    wc3 = weightVariable([5,5,128,256],'wc3')
-    bc3=  biasVariable([256],'bc3')
-    wc4 = weightVariable([5,5,256,512],'wc4')
-    bc4 =  biasVariable([512],'bc4')
-
-    wf1 = weightVariable([6144, 8192], 'wf1')
+    wf1 = weightVariable([9216, 8192], 'wf1')
     bf1 = biasVariable([8192], 'bf1')
-    wf2 = weightVariable([8192, 4096], 'wf2')
-    bf2 = biasVariable([4096], 'bf2')
-    wf3 = weightVariable([4096, 2048], 'wf3')
-    bf3 = biasVariable([2048], 'bf3')
-    wf4 = weightVariable([2048, 10], 'wf4')
-    bf4 = biasVariable([10], 'bf4')
-
-
-# model scratch pad
-# starting with a three channel image of 3 channels
-# [None, 48,64,3] - image
-# [None, 24, 32, 64] - h0
-# [None, 12, 16, 128] - h1
-# [None, 6, 8, 256] - h2
-# [None, 3, 4, 512] - h3
-
-# we then flatten h3
-# [None, 6144] - h3_flat
-# [None, 8192] - f0
-# [None, 4096] - f1
-# [None, 2048] - f2
-# [None, 10] - f3 - this is whatever the size of the flattned graph would be for 5 spaces, it is 10
+    wf2 = weightVariable([8192, 6400], 'wf2')
+    bf2 = biasVariable([6400], 'bf2')
+    wf3 = weightVariable([6400, 4096], 'wf3')
+    bf3 = biasVariable([4096],'bf3')
+    wf4 = weightVariable([4096, 2048], 'wf4')
+    bf4 = biasVariable([2048], 'bf4')
+    wf5 = weightVariable([2048, 1024], 'wf5')
+    bf5 = biasVariable([1024], 'bf5')
+    wf6 = weightVariable([1024, 512],'wf6')
+    bf6 = biasVariable([512],'bf6')
+    wf7 = weightVariable([512, 10], 'wf7')
+    bf7 = biasVariable([10], 'bf7')
 
 # this function returns the placeholders for inputs and targets
 def getPlaceHolders():
@@ -49,20 +30,20 @@ def getPlaceHolders():
 
 # this interprets the image and returns the tensor corresponding to a flattened graph
 def interpret(image, keep_prob):
-    h0 = tf.nn.sigmoid(conv2d(image, wc1) + bc1)
-    h1 = tf.nn.sigmoid(conv2d(h0, wc2) + bc2)
-    h2 = tf.nn.sigmoid(conv2d(h1, wc3) + bc3)
-    h3 = tf.nn.sigmoid(conv2d(h2, wc4) + bc4)
-    
-    h3_flat = tf.reshape(h3, [-1, 6144])
-    f0 = tf.nn.sigmoid(tf.matmul(h3_flat, wf1) + bf1)
-    f0_drop = tf.nn.dropout(f0, keep_prob)
-    f1 = tf.nn.sigmoid(tf.matmul(f0_drop, wf2) + bf2)
-    f2 = tf.nn.sigmoid(tf.matmul(f1, wf3) + bf3)
-    f3 = tf.nn.sigmoid(tf.matmul(f2, wf4) + bf4)
+    im_flat = tf.reshape(image, [-1, 9216])
 
-    # f3 is th predicted vector which has floating point numbers
-    return f3
+    h1 = tf.nn.sigmoid(tf.matmul(im_flat, wf1) + bf1)
+    h2 = tf.nn.sigmoid(tf.matmul(h1, wf2) + bf2)
+    h3 = tf.nn.sigmoid(tf.matmul(h2, wf3) + bf3)
+    h4 = tf.nn.sigmoid(tf.matmul(h3, wf4) + bf4)
+    h5 = tf.nn.sigmoid(tf.matmul(h4, wf5) + bf5)
+
+    h5_drop = tf.nn.dropout(h5, keep_prob)
+
+    h6 = tf.nn.sigmoid(tf.matmul(h5_drop, wf6) + bf6)
+    h7 = tf.nn.sigmoid(tf.matmul(h6, wf7) + bf7)
+
+    return h7
 
 def getGraph(vector):
     offset = tf.abs(vector - 0.1)
