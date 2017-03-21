@@ -46,12 +46,19 @@ def getPlaceHolders():
 
     return [image, graph_target, keep_prob]
 
+# this is a combination of convolutional layer and pooling layer
+def conv_pool(x, W, b):
+    conv = tf.nn.relu(conv3d(x, W, strides=[1,1,1,1,1]) + b)
+    pool = max_pool2x2x1(conv)
+
+    return pool
+
 # this interprets the image and returns the tensor corresponding to a flattened graph
 def interpret(image, keep_prob):
-    h1 = tf.nn.relu(conv3d(image, wc1) + bc1)
-    h2 = tf.nn.relu(conv3d(h1, wc2) + bc2)
-    h3 = tf.nn.relu(conv3d(h2, wc3) + bc3)
-    h4 = tf.nn.relu(conv3d(h3, wc4) + bc4)
+    h1 = conv_pool(image, wc1, bc1)
+    h2 = conv_pool(h1, wc2, bc2)
+    h3 = conv_pool(h2, wc3, bc3)
+    h4 = conv_pool(h3, wc4, bc4)
 
     h4_flat = tf.reshape(h4, [-1, 2304])
     

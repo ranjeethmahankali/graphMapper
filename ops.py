@@ -70,6 +70,9 @@ def conv3d(x, W, strides = [1,2,2,1,1]):
 def deConv3d(y, w, outShape, strides=[1,2,2,2,1]):
     return tf.nn.conv3d_transpose(y, w, output_shape = outShape, strides=strides, padding='SAME')
 
+# this is max-pooling for 3d convolutional layers
+def max_pool2x2x1(x):
+    return tf.nn.max_pool3d(x,ksize=[1,2,2,1,1],strides=[1,2,2,1,1],padding='SAME')
 # converts data to image
 def toImage(data):
     data = np.reshape(data, imgSize)
