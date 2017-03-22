@@ -67,12 +67,12 @@ def interpret(image, keep_prob):
     f1_drop = tf.nn.dropout(f1, keep_prob)
 
     f2 = tf.nn.relu(tf.matmul(f1_drop, wf2) + bf2)
-    f3 = tf.nn.tanh(tf.matmul(f2, wf3) + bf3)
+    f3 = tf.matmul(f2, wf3) + bf3
 
     # this is the output that is used to calculate error
-    output = (1 + f3)/2
+    # output = (1 + f3)/2
 
-    return output
+    return f3
 
 def getGraph(vector):
     # offset = tf.abs(vector - 0.1)
