@@ -62,7 +62,7 @@ def interpret(image, keep_prob):
     f1 = tf.nn.relu(tf.matmul(h4_flat, wf1) + bf1)
 
     f1_drop = tf.nn.dropout(f1, keep_prob)    
-    f2 = tf.matmul(f1_drop, wf2) + bf2
+    f2 = tf.nn.relu(tf.matmul(f1_drop, wf2) + bf2)
 
     # this is the output that is used to calculate error
     # output = (1 + f3)/2
@@ -77,9 +77,9 @@ def getGraph(vector):
 
 # this method returns the loss tensor
 def loss(vector, graph_true):
-    return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(vector, graph_true))
+    # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(vector, graph_true))
     # tf.nn.
-    # return tf.reduce_sum(tf.square(graph_true - vector))
+    return tf.reduce_sum(tf.square(graph_true - vector))
     # graph = getGraph(vector)
     # target_sum = tf.reduce_sum(graph_true)
     # graph_sum = tf.reduce_sum(vector)
