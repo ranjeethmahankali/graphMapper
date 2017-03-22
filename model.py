@@ -77,7 +77,9 @@ def interpret(image, keep_prob):
 def getGraph(vector):
     # offset = tf.abs(vector - 0.1)
     # return tf.floor(2*offset)
-    return tf.floor(2 * vector)
+    norm = tf.nn.tanh(norm)
+    corrected = (1 + norm)/2
+    return tf.floor(2 * corrected)
 
 # this method returns the loss tensor
 def loss(vector, graph_true):
