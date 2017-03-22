@@ -15,10 +15,11 @@ with tf.Session() as sess:
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 10000
+    cycles = 15000
     testStep = 200
     saveStep = 1000
     startTime = time.time()
+    test_batch_size = batch_size*10
     try:
         for i in range(cycles):
             batch = data.next_batch(batch_size)
@@ -36,7 +37,7 @@ with tf.Session() as sess:
             sys.stdout.write('...Training...|%s|-(%s/%s)- %s\r'%(pBar, i, cycles, timer))
 
             if i % testStep == 0:
-                testBatch = data.test_batch(batch_size)
+                testBatch = data.test_batch(test_batch_size)
                 acc, lval, graph_out, vec = sess.run([accuracy, lossVal, graph, vector], feed_dict={
                     image: testBatch[0],
                     target: testBatch[1],
@@ -47,7 +48,7 @@ with tf.Session() as sess:
                 t_sum = int(np.sum(testBatch[1]))
                 # tracker helps to compare the data being printed to previous run with same 
                 # training examples
-                tracker = (i/testStep)%(1000/batch_size)
+                tracker = (i/testStep)%(1000/test_batch_size)
                 # print(testBatch[0][0])
                 # print(vec[0], testBatch[1][0])
                 print('%02d Acc: %.2f; L: %.2f; Sums: %s/%s%s'%(tracker, acc, lval,g_sum,t_sum,' '*40))
