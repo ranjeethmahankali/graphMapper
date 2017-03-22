@@ -75,9 +75,9 @@ def interpret(image, keep_prob):
     return f3
 
 def getGraph(vector):
-    # offset = tf.abs(vector - 0.1)
-    # return tf.floor(2*offset)
-    norm = tf.nn.sigmoid(vector)
+    mean = tf.reduce_mean(vector, axis=1, keep_dims=True)
+    shift = vector - mean
+    norm = tf.nn.sigmoid(shift)
     return tf.round(norm)
 
 # this method returns the loss tensor
