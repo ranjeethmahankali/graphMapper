@@ -70,7 +70,7 @@ def interpret(image, keep_prob):
     return f2
 
 def getGraph(vector):
-    tf.round(vector)
+    return tf.round(vector)
     # mean = tf.reduce_mean(vector, axis=1, keep_dims=True)
     # shift = vector - mean
     # norm = tf.nn.sigmoid(shift)
