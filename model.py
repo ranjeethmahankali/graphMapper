@@ -15,14 +15,11 @@ with tf.variable_scope('vars'):
     wc4 = weightVariable([5,5,3, 48,64],'wc4')
     bc4 = biasVariable([64], 'bc4')
 
-    wf1 = weightVariable([2304, 4096], 'wf1')
-    bf1 = biasVariable([4096], 'bf1')
+    wf1 = weightVariable([2304, 2304], 'wf1')
+    bf1 = biasVariable([2304], 'bf1')
 
-    wf2 = weightVariable([4096, 8192], 'wf2')
-    bf2 = biasVariable([8192], 'bf2')
-
-    wf3 = weightVariable([8192, 10], 'wf3')
-    bf3 = biasVariable([10], 'bf3')
+    wf2 = weightVariable([2304, 10], 'wf2')
+    bf2 = biasVariable([10], 'bf2')
 
 # model scratchpad
 # [-1, 48, 64, 3, 1] - image
@@ -64,15 +61,13 @@ def interpret(image, keep_prob):
     
     f1 = tf.nn.relu(tf.matmul(h4_flat, wf1) + bf1)
 
-    f1_drop = tf.nn.dropout(f1, keep_prob)
-
-    f2 = tf.nn.relu(tf.matmul(f1_drop, wf2) + bf2)
-    f3 = tf.matmul(f2, wf3) + bf3
+    f1_drop = tf.nn.dropout(f1, keep_prob)    
+    f2 = tf.matmul(f1_drop, wf2) + bf2
 
     # this is the output that is used to calculate error
     # output = (1 + f3)/2
 
-    return f3
+    return f2
 
 def getGraph(vector):
     mean = tf.reduce_mean(vector, axis=1, keep_dims=True)
