@@ -13,7 +13,11 @@ spaceSize = [64,48]
 batch_size = 5
 # resDir = 'results/'
 resDir = 'results/'
-learning_rate = 1e-4
+
+learning_rate = 1e-5
+beta1 = 0.999
+beta2 = 0.9
+
 model_save_path = ['savedModels/model_1.ckpt',
                     'savedModels/model_2.ckpt']
 
