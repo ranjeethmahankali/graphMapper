@@ -99,7 +99,14 @@ def loss(vector, graph_true):
 
     error = (t*error_zeros) + ((1-t)*error_ones)
 
-    return error
+    # now implementing l2 loss
+    all_vars = tf.trainable_variables()
+    varList = [v for v in all_vars if 'vars' in v.name]
+    l2_loss = 0
+    for v in varList:
+        l2_loss += tf.nn.l2_loss(v)*alpha
+
+    return (error + l2_loss)
 
 # this function returns the accuracy tensor
 def accuracy(graph, graph_true):
