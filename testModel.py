@@ -16,7 +16,7 @@ with tf.Session() as sess:
     # loadModel(sess, model_save_path[1])
 
     testBatch = data.test_batch(21)
-    testBatch = data.test_batch(5)
+    testBatch = data.test_batch(40)
     acc, lval, graph_out, vec = sess.run([accuracy, lossVal, graph, vector], feed_dict={
         image: testBatch[0],
         target: testBatch[1],
@@ -28,7 +28,7 @@ with tf.Session() as sess:
     g_sum = int(np.sum(graph_out))
     t_sum = int(np.sum(testBatch[1]))
 
-    i = 0
+    i = 2
     print(vec[i])
     print(testBatch[1][i])
     print(graph_out[i].astype(np.uint8))

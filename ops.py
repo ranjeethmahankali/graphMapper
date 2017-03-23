@@ -14,9 +14,9 @@ batch_size = 5
 # resDir = 'results/'
 resDir = 'results/'
 
-learning_rate = 1e-6
+learning_rate = 1e-7
 # below is the coefficient for l2 loss
-alpha = 0.01
+alpha = 0.001
 
 model_save_path = ['savedModels/model_1.ckpt',
                     'savedModels/model_2.ckpt']
@@ -52,13 +52,13 @@ def loadModel(sess, savedPath):
 
 # weight variable
 def weightVariable(shape, name):
-    initializer = tf.truncated_normal_initializer(stddev=0.1)
+    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.02)
     weight = tf.get_variable(name=name, shape=shape, initializer=initializer)
     return weight
 
 # bias variable
 def biasVariable(shape, name):
-    initializer = tf.constant_initializer(0.1)
+    initializer = tf.constant_initializer(0.01)
     bias = tf.get_variable(name=name, shape=shape, initializer=initializer)
     return bias
 
