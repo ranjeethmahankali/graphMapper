@@ -81,7 +81,7 @@ def loss(vector, graph_true):
     # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(vector, graph_true))
     # return tf.reduce_sum(tf.abs(graph_true - vector))
     # return tf.reduce_sum(tf.square(graph_true - vector))
-    scale = 1
+    scale = 0.3
     graph = getGraph(vector)
     target_sum = tf.reduce_sum(graph_true)
     graph_sum = tf.reduce_sum(vector)
