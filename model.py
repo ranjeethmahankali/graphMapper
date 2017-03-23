@@ -81,7 +81,7 @@ def loss(vector, graph_true):
     # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(vector, graph_true))
     # return tf.reduce_sum(tf.abs(graph_true - vector))
     # return tf.reduce_sum(tf.square(graph_true - vector))
-    scale = 4
+    scale = 8
     graph = getGraph(vector)
     target_sum = tf.reduce_sum(graph_true)
     graph_sum = tf.reduce_sum(vector)
@@ -97,7 +97,7 @@ def loss(vector, graph_true):
     error_ones = tf.reduce_sum(tf.mul(absDiff, maskZeros))
     error_zeros = tf.reduce_sum(tf.mul(absDiff, maskOnes))
 
-    error = (t*error_zeros) + ((1-t)*error_ones)
+    error = (t*error_zeros) + ((1-t)*error_ones*10)
 
     return error
 
@@ -110,5 +110,5 @@ def accuracy(graph, graph_true):
 # this function returns the training step tensor
 def getOptimStep(vector, target):
     lossTensor = loss(vector, target)
-    optim = tf.train.AdamOptimizer(learning_rate, beta1, beta2).minimize(lossTensor)
+    optim = tf.train.AdamOptimizer(learning_rate).minimize(lossTensor)
     return optim

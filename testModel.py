@@ -4,8 +4,8 @@ from ops import *
 image, target, keep_prob = getPlaceHolders()
 vector = interpret(image, keep_prob)
 optim = getOptimStep(vector, target)
-# graph = getGraph(vector)
-graph = tf.round(tf.sigmoid(tf.abs(vector)))
+graph = getGraph(vector)
+# graph = tf.round(tf.sigmoid(tf.abs(vector)))
 accuracy = accuracy(graph, target)
 lossVal = loss(vector, target)
 
@@ -15,12 +15,15 @@ with tf.Session() as sess:
     loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    testBatch = data.test_batch(1)
+    testBatch = data.test_batch(21)
+    testBatch = data.test_batch(5)
     acc, lval, graph_out, vec = sess.run([accuracy, lossVal, graph, vector], feed_dict={
         image: testBatch[0],
         target: testBatch[1],
         keep_prob:1.0
     })
+
+    # print(vec)
 
     g_sum = int(np.sum(graph_out))
     t_sum = int(np.sum(testBatch[1]))
