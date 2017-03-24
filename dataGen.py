@@ -393,8 +393,8 @@ class space(sg.cSpace):
 
 coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 
+# the folder to which dataset will be saved
 dataDir = 'data2/'
-
 # number of files
 fileNum = 1
 # number of training examples that we want
@@ -421,7 +421,7 @@ for n in range(fileNum):
             sample.removeDoors()
             sample.makeRandDoors()
 
-            img = sample.render()
+            img = sample.render().convert("L")
             im_arr = prepareImage(img)
             flat_graph = sample.getFlatGraph()
 

@@ -8,7 +8,7 @@ from PIL import Image
 # some global params
 # the directory to which teh results will be saved
 # imgSize = [96,128]
-imgSize = [64,48,3]
+imgSize = [64,48]
 spaceSize = [64,48]
 batch_size = 5
 # resDir = 'results/'
@@ -79,7 +79,7 @@ def max_pool2x2x1(x):
     return tf.nn.max_pool3d(x,ksize=[1,2,2,1,1],strides=[1,2,2,1,1],padding='SAME')
 # converts data to image
 def toImage(data):
-    data = np.reshape(data, [48,64,3])
+    data = np.reshape(data, [48,64])
     newData = 255*data
     # converting new data into integer format to make it possible to export it as a bitmap
     # in this case converting it into 8 bit integer
