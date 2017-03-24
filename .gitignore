@@ -19,6 +19,7 @@ bin-release/
 # information for Eclipse / Flash Builder.
 
 __pycache__/
+*.pyc
 data/
 data2/
 savedModels/
