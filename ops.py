@@ -10,7 +10,7 @@ from PIL import Image
 # imgSize = [96,128]
 imgSize = [64,48]
 spaceSize = [64,48]
-batch_size = 5
+batch_size = 20
 # resDir = 'results/'
 resDir = 'results/'
 
@@ -52,7 +52,7 @@ def loadModel(sess, savedPath):
 
 # weight variable
 def weightVariable(shape, name):
-    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.02)
+    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.05)
     weight = tf.get_variable(name=name, shape=shape, initializer=initializer)
     return weight
 
@@ -77,6 +77,12 @@ def deConv3d(y, w, outShape, strides=[1,2,2,2,1]):
 # this is max-pooling for 3d convolutional layers
 def max_pool2x2x1(x):
     return tf.nn.max_pool3d(x,ksize=[1,2,2,1,1],strides=[1,2,2,1,1],padding='SAME')
+
+# this is a 2x2 max-pooling layer for 2d convolutional layers
+# this is max-pooling for 3d convolutional layers
+def max_pool2x2(x):
+    return tf.nn.max_pool(x,ksize=[1,2,2,1],strides=[1,2,2,1],padding='SAME')
+
 # converts data to image
 def toImage(data):
     data = np.reshape(data, [48,64])
@@ -175,7 +181,8 @@ class dataset:
             if not silent: print('\nLoading data from %s...'%self.curFile)
             dSet = pickle.load(inp)
         
-        self.data = [np.expand_dims(np.array(dSet[0]),4), np.array(dSet[1])]
+        self.data = [np.expand_dims(np.array(dSet[0]),3), np.array(dSet[1])]
+        # self.data = [np.array(dSet[0]), np.array(dSet[1])]
         # self.data = dSet
         
         if self.test_data is None:
@@ -183,8 +190,10 @@ class dataset:
                 if not silent: print('\nLoading test data from %s...'%self.testFileName)
                 dSet = pickle.load(inp)
             
-            self.test_data = [np.expand_dims(np.array(dSet[0]),4), np.array(dSet[1])]
+            self.test_data = [np.expand_dims(np.array(dSet[0]),3), np.array(dSet[1])]
+            # self.test_data = [np.array(dSet[0]), np.array(dSet[1])]
             # self.test_data = dSet
+        if not silent: print('\nDataset in %s is successfully loaded'%self.dirPath)
     
     # this returns the next batch of the size - size
     def next_batch(self, size):
