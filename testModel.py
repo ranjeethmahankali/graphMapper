@@ -7,7 +7,7 @@ optim = getOptimStep(vector, target)
 graph = getGraph(vector)
 # graph = tf.round(tf.sigmoid(tf.abs(vector)))
 accuracy = accuracy(graph, target)
-lossVal = loss(vector, target)
+lossVal = loss_custom(vector, target)
 
 data = dataset('data2/')
 with tf.Session() as sess:

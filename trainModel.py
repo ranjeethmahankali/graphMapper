@@ -7,7 +7,7 @@ vector = interpret(image, keep_prob)
 optim = getOptimStep(vector, target)
 graph = getGraph(vector)
 accuracy = accuracy(graph, target)
-lossVal = loss(vector, target)
+lossVal = loss_custom(vector, target)
 
 data = dataset('data2/')
 with tf.Session() as sess:
@@ -15,11 +15,11 @@ with tf.Session() as sess:
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 12500
-    testStep = 100
-    saveStep = 1000
+    cycles = 100000
+    testStep = 500
+    saveStep = 5000
     startTime = time.time()
-    test_batch_size = batch_size*10
+    test_batch_size = 2500
     try:
         for i in range(cycles):
             batch = data.next_batch(batch_size)
@@ -48,10 +48,10 @@ with tf.Session() as sess:
                 t_sum = int(np.sum(testBatch[1]))
                 # tracker helps to compare the data being printed to previous run with same 
                 # training examples
-                tracker = (i/testStep)%(1000/test_batch_size)
+                # tracker = (i/testStep)%(2500/test_batch_size)
                 # print(testBatch[0][0])
                 # print(vec[0], testBatch[1][0])
-                print('%02d Acc: %.2f; L: %.2f; Sums: %s/%s%s'%(tracker, acc, lval,g_sum,t_sum,' '*40))
+                print('Acc: %.2f; L: %.2f; Sums: %s/%s%s'%(acc, lval,g_sum,t_sum,' '*40))
         
         # now saving the trained model every 1500 cycles
             if i % saveStep == 0 and i != 0:
