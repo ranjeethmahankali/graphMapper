@@ -193,7 +193,7 @@ class dataset:
             self.test_data = [np.expand_dims(np.array(dSet[0]),3), np.array(dSet[1])]
             # self.test_data = [np.array(dSet[0]), np.array(dSet[1])]
             # self.test_data = dSet
-        if not silent: print('\nDataset in %s is successfully loaded'%self.dirPath)
+        if not silent: print('\nDataset in %s is successfully loaded\n'%self.dirPath)
     
     # this returns the next batch of the size - size
     def next_batch(self, size):

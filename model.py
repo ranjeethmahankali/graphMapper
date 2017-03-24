@@ -91,21 +91,21 @@ def loss(vector, graph_true):
 
 # this is the custom loss that I used for the voxel models
 def loss_custom(vector, graph_true):
-    scale = 0.1
+    scale = 1
     graph = getGraph(vector)
     target_sum = tf.reduce_sum(graph_true)
     graph_sum = tf.reduce_sum(vector)
     absDiff = tf.abs(vector - graph_true)/scale
 
-    # return tf.reduce_sum(absDiff)
-    shiftBias = 100
+    # higher shift bias makes the transition of 't' near zero mode sudden
+    shiftBias = 20
     t = tf.nn.sigmoid((graph_sum - target_sum) * shiftBias)
 
     maskZeros = graph_true
     maskOnes = 1 - graph_true
 
-    error_ones = tf.reduce_mean(tf.mul(absDiff, maskZeros))
-    error_zeros = tf.reduce_mean(tf.mul(absDiff, maskOnes))
+    error_ones = tf.reduce_sum(tf.mul(absDiff, maskZeros))
+    error_zeros = tf.reduce_sum(tf.mul(absDiff, maskOnes))
 
     error = (t*error_zeros) + ((1-t)*error_ones)
 
