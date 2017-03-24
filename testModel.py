@@ -9,14 +9,14 @@ graph = getGraph(vector)
 accuracy = accuracy(graph, target)
 lossVal = loss(vector, target)
 
-data = dataset('data/')
+data = dataset('data2/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
     testBatch = data.test_batch(21)
-    testBatch = data.test_batch(40)
+    testBatch = data.test_batch(5)
     acc, lval, graph_out, vec = sess.run([accuracy, lossVal, graph, vector], feed_dict={
         image: testBatch[0],
         target: testBatch[1],
@@ -28,7 +28,7 @@ with tf.Session() as sess:
     g_sum = int(np.sum(graph_out))
     t_sum = int(np.sum(testBatch[1]))
 
-    i = 2
+    i = 3
     print(vec[i])
     print(testBatch[1][i])
     print(graph_out[i].astype(np.uint8))

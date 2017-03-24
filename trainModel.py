@@ -9,15 +9,15 @@ graph = getGraph(vector)
 accuracy = accuracy(graph, target)
 lossVal = loss(vector, target)
 
-data = dataset('data/')
+data = dataset('data2/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
     cycles = 15000
-    testStep = 100
-    saveStep = 1000
+    testStep = 20
+    saveStep = 60
     startTime = time.time()
     test_batch_size = batch_size*10
     try:

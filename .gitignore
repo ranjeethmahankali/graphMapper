@@ -20,4 +20,5 @@ bin-release/
 
 __pycache__/
 data/
+data2/
 savedModels/

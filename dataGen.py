@@ -45,6 +45,9 @@ class wall:
         
         # print('%s neighbors'%len(self.nbrs))
         
+    # this method removes all doors
+    def removeAllDoors(self):
+        self.doors = list()
     # this is the default string parsing
     def __str__(self):
         return "[%s, %s]"%(self.start, self.end)
@@ -270,12 +273,22 @@ class space(sg.cSpace):
     # this randomly populates the walls with doors
     def makeRandDoors(self):
         for w in self.walls:
+            # removing any doors that were previously created
             if len(w.nbrs) < 2:
                 continue
             # this is the range to make random decision
             dec = [0.3, 0.5]
             if random.uniform(0,1) > random.uniform(dec[0], dec[1]):
                 d = door(w, random.uniform(0,1))
+    # this removes all doors and connections between child spaces
+    def removeDoors(self):
+        for w in self.walls:
+            w.removeAllDoors()
+        
+        for cName in self.c:
+            self.c[cName].con = dict()
+            self.c[cName].connected = set()
+
     # this returns the flat version of the graph of it's children's connection
     def getFlatGraph(self):
         num = len(nameList)
@@ -380,13 +393,20 @@ class space(sg.cSpace):
 
 coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 
-dataDir = 'data/'
+dataDir = 'data2/'
 
-for n in range(1):
+# number of files
+fileNum = 1
+# number of training examples that we want
+dataNum = 1
+# number of door variations in each example
+doorVarNum = 5
+
+for n in range(fileNum):
     im_data = list()
     graph_data = list()
     i = 0
-    while i < 1000:
+    while i < dataNum:
         sample = space('sample', nameList, coords)
         sample.populatePts()
         sample.makeWalls()
@@ -396,14 +416,18 @@ for n in range(1):
             # this is a rare random occurence
             continue
         sample.splitWalls()
-        sample.makeRandDoors()
 
-        img = sample.render()
-        im_arr = prepareImage(img)
-        flat_graph = sample.getFlatGraph()
+        for j in range(doorVarNum):
+            sample.removeDoors()
+            sample.makeRandDoors()
 
-        im_data.append(im_arr)
-        graph_data.append(flat_graph)
+            img = sample.render()
+            im_arr = prepareImage(img)
+            flat_graph = sample.getFlatGraph()
+
+            im_data.append(im_arr)
+            graph_data.append(flat_graph)
+
         sys.stdout.write('%s examples generated\r'%(i+1))
         
         i += 1

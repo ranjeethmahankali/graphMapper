@@ -78,35 +78,41 @@ def getGraph(vector):
 
 # this method returns the loss tensor
 def loss(vector, graph_true):
-    # return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(vector, graph_true))
     # return tf.reduce_sum(tf.abs(graph_true - vector))
     # return tf.reduce_sum(tf.square(graph_true - vector))
-    scale = 0.1
-    graph = getGraph(vector)
-    target_sum = tf.reduce_sum(graph_true)
-    graph_sum = tf.reduce_sum(vector)
-    absDiff = tf.abs(vector - graph_true)/scale
 
-    # return tf.reduce_sum(absDiff)
+    epsilon = 1e-9
+    cross_entropy = (graph_true * tf.log(vector + epsilon)) + ((1-graph_true)*tf.log(1-vector+epsilon))
+    return -tf.reduce_sum(cross_entropy)
 
-    t = tf.nn.sigmoid(graph_sum - target_sum)
 
-    maskZeros = graph_true
-    maskOnes = 1 - graph_true
+    # scale = 0.1
+    # graph = getGraph(vector)
+    # target_sum = tf.reduce_sum(graph_true)
+    # graph_sum = tf.reduce_sum(vector)
+    # absDiff = tf.abs(vector - graph_true)/scale
 
-    error_ones = tf.reduce_mean(tf.mul(absDiff, maskZeros))
-    error_zeros = tf.reduce_mean(tf.mul(absDiff, maskOnes))
-    
-    error = (t*error_zeros) + ((1-t)*error_ones)
+    # # return tf.reduce_sum(absDiff)
+    # shiftBias = 100
+    # t = tf.nn.sigmoid((graph_sum - target_sum) * shiftBias)
 
-    # now implementing l2 loss
-    all_vars = tf.trainable_variables()
-    varList = [v for v in all_vars if 'vars' in v.name]
-    l2_loss = 0
-    for v in varList:
-        l2_loss += tf.nn.l2_loss(v)*alpha
+    # maskZeros = graph_true
+    # maskOnes = 1 - graph_true
 
-    return (error + l2_loss)
+    # error_ones = tf.reduce_mean(tf.mul(absDiff, maskZeros))
+    # error_zeros = tf.reduce_mean(tf.mul(absDiff, maskOnes))
+
+    # error = (t*error_zeros) + ((1-t)*error_ones)
+
+    # # now implementing l2 loss
+    # all_vars = tf.trainable_variables()
+    # varList = [v for v in all_vars if 'vars' in v.name]
+    # l2_loss = 0
+    # for v in varList:
+    #     l2_loss += tf.nn.l2_loss(v)*alpha
+
+    # # return (error + l2_loss)
+    # return error
 
 # this function returns the accuracy tensor
 def accuracy(graph, graph_true):
