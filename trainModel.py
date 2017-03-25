@@ -19,9 +19,10 @@ with tf.Session() as sess:
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 25000
+    cycles = 1000000
     testStep = 500
     saveStep = 2000
+    log_step = 1
     startTime = time.time()
     test_batch_size = 500
     try:
@@ -32,7 +33,7 @@ with tf.Session() as sess:
                 target: batch[1],
                 keep_prob:0.5
             })
-            train_writer.add_summary(summary, i)
+            if i % log_step == 0: train_writer.add_summary(summary, i)
 
             timer = estimate_time(startTime, cycles, i)
             pL = 20 # this is the length of the progress bar to be displayed
