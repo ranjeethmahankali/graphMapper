@@ -139,12 +139,14 @@ def loss_custom(vector, graph_true):
 # this function returns the accuracy tensor
 def accuracy(graph, graph_true):
     correctness = tf.equal(graph, graph_true)
-    acc_norm = tf.reduce_mean(tf.cast(correctness, tf.float32))
+    acc_norm = tf.cast(correctness, tf.float32)
     acc = tf.multiply(acc_norm, 100, name='accuracy')
 
-    summarize(acc)
+    acc_by_example = tf.reduce_mean(acc, axis=1)
 
-    return acc
+    summarize(acc_by_example)
+
+    return tf.reduce_mean(acc_by_example)
 
 # this function returns the training step tensor
 def getOptimStep(vector, target):
