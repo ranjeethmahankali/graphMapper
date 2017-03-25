@@ -11,8 +11,10 @@ from PIL import Image
 imgSize = [64,48]
 spaceSize = [64,48]
 batch_size = 20
-# resDir = 'results/'
+# folder to save the results in
 resDir = 'results/'
+# folder to log the training progress in
+log_dir  = 'train_log/1/'
 
 learning_rate = 1e-5
 # below is the coefficient for l2 loss
@@ -252,5 +254,29 @@ class dataset:
 def writeToFile(data, path):
     with open(path, 'wb') as output:
         pickle.dump(data, output, pickle.HIGHEST_PROTOCOL)
+
+# this creates summaries for variables to be sued by tensorboard
+def summarize(varT):
+    varName = varT.name[:-2]
+    with tf.name_scope(varName):
+        var_mean = tf.reduce_mean(varT)
+        var_sum = tf.reduce_sum(varT)
+        tf.summary.scalar('mean', var_mean)
+        tf.summary.scalar('sum', var_sum)
+
+        with tf.name_scope('stddev'):
+            stddev = tf.sqrt(tf.reduce_mean(tf.square(varT - var_mean)))
+        
+        tf.summary.scalar('stddev', stddev)
+        tf.summary.scalar('max', tf.reduce_max(varT))
+        tf.summary.scalar('min', tf.reduce_min(varT))
+        tf.summary.histogram('histogram', varT)
+
+# this returns the writer objects for training and testing
+def getSummaryWriters(sess):
+    train_writer = tf.summary.FileWriter(log_dir + 'train', sess.graph)
+    test_writer = tf.summary.FileWriter(log_dir + 'test')
+
+    return [train_writer, test_writer]
 # from here down is the sandbox place to check and verify the code above before using it in
 # the other files
