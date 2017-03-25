@@ -140,9 +140,9 @@ def loss_custom(vector, graph_true):
 def accuracy(graph, graph_true):
     correctness = tf.equal(graph, graph_true)
     acc_norm = tf.cast(correctness, tf.float32)
-    acc = tf.multiply(acc_norm, 100, name='accuracy')
+    acc = tf.multiply(acc_norm, 100)
 
-    acc_by_example = tf.reduce_mean(acc, axis=1)
+    acc_by_example = tf.reduce_mean(acc, axis=1,name='accuracy')
 
     summarize(acc_by_example)
 
