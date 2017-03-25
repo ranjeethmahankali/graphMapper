@@ -28,10 +28,10 @@ with tf.variable_scope('vars'):
     bf4 = biasVariable([10], 'bf4')
 
 # adding summaries to all the above variables
-all_vars = tf.trainable_variables()
-varList = [v for v in all_vars if 'vars' in v.name]
-for v in varList:
-    summarize(v)
+# all_vars = tf.trainable_variables()
+# varList = [v for v in all_vars if 'vars' in v.name]
+# for v in varList:
+#     summarize(v)
 
 # model scratchpad
 # [-1, 48, 64, 1] - image
@@ -91,7 +91,7 @@ def getGraph(vector, toSummarize = False):
     graph = tf.round(vector, name='graph_out')
     if toSummarize: 
         summarize(graph)
-        
+
     return graph
 
 # this method returns the loss tensor
@@ -129,9 +129,9 @@ def loss_custom(vector, graph_true):
         tf.summary.scalar('e_combined', error)
 
     # now implementing l2 loss
-    l2_loss = 0
-    for v in varList:
-        l2_loss += tf.nn.l2_loss(v)*alpha
+    # l2_loss = 0
+    # for v in varList:
+    #     l2_loss += tf.nn.l2_loss(v)*alpha
 
     # return (error + l2_loss)
     return error
@@ -139,9 +139,10 @@ def loss_custom(vector, graph_true):
 # this function returns the accuracy tensor
 def accuracy(graph, graph_true):
     correctness = tf.equal(graph, graph_true)
-    acc = 100*tf.reduce_mean(tf.cast(correctness, tf.float32))
+    acc_norm = tf.reduce_mean(tf.cast(correctness, tf.float32))
+    acc = tf.multiply(acc_norm, 100, name='accuracy')
 
-    tf.summary.scalar('accuracy', acc)
+    summarize(acc)
 
     return acc
 
