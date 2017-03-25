@@ -3,29 +3,35 @@ from ops import *
 import tensorflow as tf
 
 with tf.variable_scope('vars'):
-    wc1 = weightVariable([5,5, 1,16],'wc1')
-    bc1 = biasVariable([16], 'bc1')
+    wc1 = weightVariable([5,5, 1,32],'wc1')
+    bc1 = biasVariable([32], 'bc1')
 
-    wc2 = weightVariable([5,5, 16,32],'wc2')
-    bc2 = biasVariable([32], 'bc2')
+    wc2 = weightVariable([5,5, 32,64],'wc2')
+    bc2 = biasVariable([64], 'bc2')
     
-    wc3 = weightVariable([5,5, 32,48],'wc3')
-    bc3 = biasVariable([48], 'bc3')
+    wc3 = weightVariable([5,5, 64,128],'wc3')
+    bc3 = biasVariable([128], 'bc3')
     
-    wc4 = weightVariable([5,5, 48,64],'wc4')
-    bc4 = biasVariable([64], 'bc4')
+    wc4 = weightVariable([5,5, 128,256],'wc4')
+    bc4 = biasVariable([256], 'bc4')
 
-    wf1 = weightVariable([768, 1024], 'wf1')
-    bf1 = biasVariable([1024], 'bf1')
+    wf1 = weightVariable([3072, 4096], 'wf1')
+    bf1 = biasVariable([4096], 'bf1')
 
-    wf2 = weightVariable([1024, 1024], 'wf2')
-    bf2 = biasVariable([1024], 'bf2')
+    wf2 = weightVariable([4096, 2048], 'wf2')
+    bf2 = biasVariable([2048], 'bf2')
 
-    wf3 = weightVariable([1024, 512], 'wf3')
-    bf3 = biasVariable([512], 'bf3')
+    wf3 = weightVariable([2048, 1024], 'wf3')
+    bf3 = biasVariable([1024], 'bf3')
 
-    wf4 = weightVariable([512, 10], 'wf4')
+    wf4 = weightVariable([1024, 10], 'wf4')
     bf4 = biasVariable([10], 'bf4')
+
+# adding summaries to all the above variables
+all_vars = tf.trainable_variables()
+varList = [v for v in all_vars if 'vars' in v.name]
+for v in varList:
+    summarize(v)
 
 # model scratchpad
 # [-1, 48, 64, 1] - image
@@ -64,22 +70,29 @@ def interpret(image, keep_prob):
     h3 = conv_pool(h2, wc3, bc3)
     h4 = conv_pool(h3, wc4, bc4)
 
-    h4_flat = tf.reshape(h4, [-1, 768])
+    h4_flat = tf.reshape(h4, [-1, 3072])
     
     f1 = tf.nn.relu(tf.matmul(h4_flat, wf1) + bf1)
     f2 = tf.nn.relu(tf.matmul(f1, wf2) + bf2)
     f3 = tf.nn.relu(tf.matmul(f2, wf3) + bf3)
 
     f3_drop = tf.nn.dropout(f3, keep_prob)
-    f4 = tf.nn.relu(tf.matmul(f3_drop, wf4) + bf4)
+    f4 = tf.nn.sigmoid(tf.matmul(f3_drop, wf4) + bf4, name = 'output')
+
+    # adding summaries for the final output
+    summarize(f4)
 
     return f4
 
 # this one converts the output of the network into 1 or 0 format
-def getGraph(vector):
+def getGraph(vector, toSummarize = False):
     # defined this as a separate function just in case I change the network in the future
     # and will need to do more than just rounding to map its output to 0 or 1
-    return tf.round(vector)
+    graph = tf.round(vector, name='graph_out')
+    if toSummarize: 
+        summarize(graph)
+        
+    return graph
 
 # this method returns the loss tensor
 def loss(vector, graph_true):
@@ -94,13 +107,12 @@ def loss_custom(vector, graph_true):
     scale = 1
     graph = getGraph(vector)
     target_sum = tf.reduce_sum(graph_true)
-    graph_sum = tf.reduce_sum(vector)
+    graph_sum = tf.reduce_sum(getGraph(vector))
     absDiff = tf.abs(vector - graph_true)/scale
 
     # higher shift bias makes the transition of 't' near zero mode sudden
-    shiftBias = 20
+    shiftBias = 100
     t = tf.nn.sigmoid((graph_sum - target_sum) * shiftBias)
-
     maskZeros = graph_true
     maskOnes = 1 - graph_true
 
@@ -109,9 +121,14 @@ def loss_custom(vector, graph_true):
 
     error = (t*error_zeros) + ((1-t)*error_ones)
 
+    # sending this to summary
+    with tf.name_scope('loss_params'):
+        tf.summary.scalar('toggleFactor', t)
+        tf.summary.scalar('e_zeros', (t*error_zeros))
+        tf.summary.scalar('e_ones', ((1-t)*error_ones))
+        tf.summary.scalar('e_combined', error)
+
     # now implementing l2 loss
-    all_vars = tf.trainable_variables()
-    varList = [v for v in all_vars if 'vars' in v.name]
     l2_loss = 0
     for v in varList:
         l2_loss += tf.nn.l2_loss(v)*alpha
@@ -123,6 +140,9 @@ def loss_custom(vector, graph_true):
 def accuracy(graph, graph_true):
     correctness = tf.equal(graph, graph_true)
     acc = 100*tf.reduce_mean(tf.cast(correctness, tf.float32))
+
+    tf.summary.scalar('accuracy', acc)
+
     return acc
 
 # this function returns the training step tensor
