@@ -12,7 +12,7 @@ lossVal = loss_custom(vector, target)
 # this is for the summaries during the training
 merged = tf.summary.merge_all()
 
-data = dataset('data2/')
+data = dataset('data/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     train_writer, test_writer = getSummaryWriters(sess)

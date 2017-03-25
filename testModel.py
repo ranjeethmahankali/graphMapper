@@ -9,7 +9,7 @@ graph = getGraph(vector)
 accuracy = accuracy(graph, target)
 lossVal = loss_custom(vector, target)
 
-data = dataset('data2/')
+data = dataset('data/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     loadModel(sess, model_save_path[0])
