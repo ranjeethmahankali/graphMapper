@@ -5,29 +5,34 @@ from ops import *
 image, target, keep_prob = getPlaceHolders()
 vector = interpret(image, keep_prob)
 optim = getOptimStep(vector, target)
-graph = getGraph(vector)
+graph = getGraph(vector, True)
 accuracy = accuracy(graph, target)
 lossVal = loss_custom(vector, target)
+
+# this is for the summaries during the training
+merged = tf.summary.merge_all()
 
 data = dataset('data2/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
+    train_writer, test_writer = getSummaryWriters(sess)
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 100000
+    cycles = 25000
     testStep = 500
-    saveStep = 5000
+    saveStep = 2000
     startTime = time.time()
-    test_batch_size = 2500
+    test_batch_size = 500
     try:
         for i in range(cycles):
             batch = data.next_batch(batch_size)
-            _ = sess.run(optim, feed_dict={
+            _, summary = sess.run([optim, merged], feed_dict={
                 image: batch[0],
                 target: batch[1],
                 keep_prob:0.5
             })
+            train_writer.add_summary(summary, i)
 
             timer = estimate_time(startTime, cycles, i)
             pL = 20 # this is the length of the progress bar to be displayed
@@ -38,12 +43,19 @@ with tf.Session() as sess:
 
             if i % testStep == 0:
                 testBatch = data.test_batch(test_batch_size)
-                acc, lval, graph_out, vec = sess.run([accuracy, lossVal, graph, vector], feed_dict={
+                summary, acc, lval, graph_out, vec = sess.run([
+                    merged, 
+                    accuracy, 
+                    lossVal, 
+                    graph, 
+                    vector
+                    ],feed_dict={
                     image: testBatch[0],
                     target: testBatch[1],
                     keep_prob:1.0
                 })
-                
+                test_writer.add_summary(summary, i)
+
                 g_sum = int(np.sum(graph_out))
                 t_sum = int(np.sum(testBatch[1]))
                 # tracker helps to compare the data being printed to previous run with same 
