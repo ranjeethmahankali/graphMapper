@@ -397,10 +397,11 @@ coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 dataDir = 'data/'
 # number of files
 fileNum = 51
-# number of training examples that we want
+# number of training configurations per file that we want
 dataNum = 100
-# number of door variations in each example
+# number of door variations in each configuration
 doorVarNum = 20
+# total size of the dataset is fileNum * dataNum * doorVarNum
 
 for n in range(fileNum):
     im_data = list()
