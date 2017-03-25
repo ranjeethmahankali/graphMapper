@@ -394,13 +394,13 @@ class space(sg.cSpace):
 coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 
 # the folder to which dataset will be saved
-dataDir = 'data2/'
+dataDir = 'data/'
 # number of files
-fileNum = 11
+fileNum = 51
 # number of training examples that we want
-dataNum = 500
+dataNum = 100
 # number of door variations in each example
-doorVarNum = 10
+doorVarNum = 20
 
 for n in range(fileNum):
     im_data = list()
@@ -421,7 +421,7 @@ for n in range(fileNum):
             sample.removeDoors()
             sample.makeRandDoors()
 
-            img = sample.render().convert("L")
+            img = sample.render().convert("L")# making the image grayscale
             im_arr = prepareImage(img)
             flat_graph = sample.getFlatGraph()
 
