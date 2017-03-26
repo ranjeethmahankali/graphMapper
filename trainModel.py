@@ -22,7 +22,7 @@ with tf.Session() as sess:
     cycles = 1600000
     testStep = 500
     saveStep = 2000
-    log_step = 5
+    log_step = 10
     startTime = time.time()
     test_batch_size = 2000
     try:

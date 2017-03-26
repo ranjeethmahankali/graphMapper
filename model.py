@@ -21,10 +21,10 @@ with tf.variable_scope('vars'):
     wf2 = weightVariable([4096, 2048], 'wf2')
     bf2 = biasVariable([2048], 'bf2')
 
-    wf3 = weightVariable([2048, 1024], 'wf3')
-    bf3 = biasVariable([1024], 'bf3')
+    wf3 = weightVariable([2048, 2048], 'wf3')
+    bf3 = biasVariable([2048], 'bf3')
 
-    wf4 = weightVariable([1024, 10], 'wf4')
+    wf4 = weightVariable([2048, 10], 'wf4')
     bf4 = biasVariable([10], 'bf4')
 
 # adding summaries to all the above variables
@@ -35,15 +35,15 @@ with tf.variable_scope('vars'):
 
 # model scratchpad
 # [-1, 48, 64, 1] - image
-# [-1, 24, 32, 16] - h1
-# [-1, 12, 16, 32] - h2
-# [-1, 6, 8, 48] - h3
-# [-1, 3, 4, 64] - h4
+# [-1, 24, 32, 32] - h1
+# [-1, 12, 16, 64] - h2
+# [-1, 6, 8, 128] - h3
+# [-1, 3, 4, 256] - h4
 
-# [-1, 768] - h4_flat
-# [-1, 1024] - f1
-# [-1, 1024] - f2
-# [-1, 512] - f3
+# [-1, 3072] - h4_flat
+# [-1, 4096] - f1
+# [-1, 2048] - f2
+# [-1, 2048] - f3
 # [-1, 10] - f4 - flat graph to be returned
 
 # this function returns the placeholders for inputs and targets
