@@ -132,6 +132,13 @@ def loss_custom(m, g, gTrue):
 
     error = (factor*error_zeros) + ((1-factor)*error_ones)
 
+    # sending this to summary
+    with tf.name_scope('loss_params'):
+        tf.summary.scalar('toggleFactor', t)
+        tf.summary.scalar('e_zeros', (t*error_zeros))
+        tf.summary.scalar('e_ones', ((1-t)*error_ones))
+        tf.summary.scalar('e_combined', error)
+
     # now implementing l2 loss
     # l2_loss = 0
     # for v in varList:
