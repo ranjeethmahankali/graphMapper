@@ -54,13 +54,13 @@ def loadModel(sess, savedPath):
 
 # weight variable
 def weightVariable(shape, name):
-    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.01)
+    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.0001)
     weight = tf.get_variable(name=name, shape=shape, initializer=initializer)
     return weight
 
 # bias variable
 def biasVariable(shape, name):
-    initializer = tf.constant_initializer(0.01)
+    initializer = tf.constant_initializer(0.0001)
     bias = tf.get_variable(name=name, shape=shape, initializer=initializer)
     return bias
 
