@@ -71,13 +71,12 @@ def interpret(image, keep_prob):
     h4 = conv_pool(h3, wc4, bc4)
 
     h4_flat = tf.reshape(h4, [-1, 3072])
-    
-    f1 = tf.nn.relu(tf.matmul(h4_flat, wf1) + bf1)
+    h4_flat_drop = tf.nn.dropout(h4_flat, keep_prob)
+
+    f1 = tf.nn.relu(tf.matmul(h4_flat_drop, wf1) + bf1)
     f2 = tf.nn.relu(tf.matmul(f1, wf2) + bf2)
     f3 = tf.nn.relu(tf.matmul(f2, wf3) + bf3)
-
-    f3_drop = tf.nn.dropout(f3, keep_prob)
-    f4 = tf.nn.sigmoid(tf.matmul(f3_drop, wf4) + bf4, name = 'output')
+    f4 = tf.nn.sigmoid(tf.matmul(f3, wf4) + bf4, name = 'output')
 
     # adding summaries for the final output
     summarize(f4)
@@ -100,7 +99,14 @@ def loss(vector, graph_true):
     # return tf.reduce_sum(tf.square(graph_true - vector))
     epsilon = 1e-9
     cross_entropy = (graph_true * tf.log(vector + epsilon)) + ((1-graph_true)*tf.log(1-vector+epsilon))
-    return -tf.reduce_sum(cross_entropy)
+    
+    # adding this to summaries
+    ce_by_example = -tf.reduce_sum(cross_entropy, axis=1, name='cross_entropy')
+    summarize(ce_by_example)
+
+    ce_loss = -tf.reduce_sum(cross_entropy)
+
+    return ce_loss
 
 # this is the custom loss that I used for the voxel models
 def loss_custom(vector, graph_true):
@@ -111,7 +117,7 @@ def loss_custom(vector, graph_true):
     absDiff = tf.abs(vector - graph_true)/scale
 
     # higher shift bias makes the transition of 't' near zero mode sudden
-    shiftBias = 100
+    shiftBias = 0.1
     t = tf.nn.sigmoid((graph_sum - target_sum) * shiftBias)
     maskZeros = graph_true
     maskOnes = 1 - graph_true
