@@ -17,12 +17,12 @@ with tf.Session() as sess:
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 3000000
+    cycles = 2000000
     testStep = 500
     saveStep = 2000
     log_step = 10
     startTime = time.time()
-    test_batch_size = 500
+    test_batch_size = 2000
     try:
         for i in range(cycles):
             batch = data.next_batch(batch_size)
