@@ -81,13 +81,15 @@ def interpret(image, keep_prob):
     # adding summaries for the final output
     summarize(f4)
 
-    return f4
+    return [f4, getGraph(f4)]
 
 # this one converts the output of the network into 1 or 0 format
 def getGraph(vector, toSummarize = False):
     # defined this as a separate function just in case I change the network in the future
     # and will need to do more than just rounding to map its output to 0 or 1
-    graph = tf.round(vector, name='graph_out')
+    # small constant for numerical stability
+    epsilon = 1e-9
+    graph = tf.floor(2*(vector-epsilon))
     if toSummarize: 
         summarize(graph)
 
@@ -109,30 +111,26 @@ def loss(vector, graph_true):
     return ce_loss
 
 # this is the custom loss that I used for the voxel models
-def loss_custom(vector, graph_true):
-    scale = 1
-    graph = getGraph(vector)
-    target_sum = tf.reduce_sum(graph_true)
-    graph_sum = tf.reduce_sum(getGraph(vector))
-    absDiff = tf.abs(vector - graph_true)/scale
+def loss_custom(m, g, gTrue):
+    # this is the absolute difference between the two tensors
+    absDiff = tf.abs(m - gTrue)
+    
+    scale = 2
+    g_sum = tf.reduce_sum(g) / scale
+    gTrue_sum = tf.reduce_sum(gTrue) / scale
 
-    # higher shift bias makes the transition of 't' near zero mode sudden
-    shiftBias = 0.1
-    t = tf.nn.sigmoid((graph_sum - target_sum) * shiftBias)
-    maskZeros = graph_true
-    maskOnes = 1 - graph_true
+    maskZeros = gTrue
+    maskOnes = 1 - gTrue
 
+    # this is the error for not filling the voxels that are supposed to be filled
     error_ones = tf.reduce_sum(tf.mul(absDiff, maskZeros))
+    # this is the error for filling the voxels that are not supposed to be filled
     error_zeros = tf.reduce_sum(tf.mul(absDiff, maskOnes))
 
-    error = (t*error_zeros) + ((1-t)*error_ones)
+    # this is the dynamic factor representing how much you care about which error
+    factor = tf.nn.sigmoid(g_sum - gTrue_sum)
 
-    # sending this to summary
-    with tf.name_scope('loss_params'):
-        tf.summary.scalar('toggleFactor', t)
-        tf.summary.scalar('e_zeros', (t*error_zeros))
-        tf.summary.scalar('e_ones', ((1-t)*error_ones))
-        tf.summary.scalar('e_combined', error)
+    error = (factor*error_zeros) + ((1-factor)*error_ones)
 
     # now implementing l2 loss
     # l2_loss = 0
@@ -155,7 +153,7 @@ def accuracy(graph, graph_true):
     return tf.reduce_mean(acc_by_example)
 
 # this function returns the training step tensor
-def getOptimStep(vector, target):
-    lossTensor = loss(vector, target)
+def getOptimStep(vector, graph, target):
+    lossTensor = loss_custom(vector, graph, target)
     optim = tf.train.AdamOptimizer(learning_rate).minimize(lossTensor)
-    return optim
+    return [optim, lossTensor]
