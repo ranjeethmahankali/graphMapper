@@ -115,7 +115,7 @@ def loss_custom(m, g, gTrue):
     # this is the absolute difference between the two tensors
     absDiff = tf.abs(m - gTrue)
     
-    scale = 2
+    scale = 10
     g_sum = tf.reduce_sum(g) / scale
     gTrue_sum = tf.reduce_sum(gTrue) / scale
 
@@ -134,9 +134,9 @@ def loss_custom(m, g, gTrue):
 
     # sending this to summary
     with tf.name_scope('loss_params'):
-        tf.summary.scalar('toggleFactor', t)
-        tf.summary.scalar('e_zeros', (t*error_zeros))
-        tf.summary.scalar('e_ones', ((1-t)*error_ones))
+        tf.summary.scalar('toggleFactor', factor)
+        tf.summary.scalar('e_zeros', (factor * error_zeros))
+        tf.summary.scalar('e_ones', ((1-factor)*error_ones))
         tf.summary.scalar('e_combined', error)
 
     # now implementing l2 loss

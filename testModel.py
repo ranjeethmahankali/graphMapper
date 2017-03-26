@@ -3,11 +3,9 @@ from ops import *
 
 image, target, keep_prob = getPlaceHolders()
 vector = interpret(image, keep_prob)
-optim = getOptimStep(vector, target)
+optim, lossVal = getOptimStep(vector, target)
 graph = getGraph(vector)
-# graph = tf.round(tf.sigmoid(tf.abs(vector)))
 accuracy = accuracy(graph, target)
-lossVal = loss_custom(vector, target)
 
 data = dataset('data/')
 with tf.Session() as sess:

@@ -3,11 +3,9 @@ import sys
 from ops import *
 
 image, target, keep_prob = getPlaceHolders()
-vector = interpret(image, keep_prob)
-optim = getOptimStep(vector, target)
-graph = getGraph(vector, True)
+vector, graph = interpret(image, keep_prob)
+optim, lossVal = getOptimStep(vector, graph, target)
 accuracy = accuracy(graph, target)
-lossVal = loss_custom(vector, target)
 
 # this is for the summaries during the training
 merged = tf.summary.merge_all()
@@ -24,7 +22,7 @@ with tf.Session() as sess:
     saveStep = 2000
     log_step = 10
     startTime = time.time()
-    test_batch_size = 2000
+    test_batch_size = 500
     try:
         for i in range(cycles):
             batch = data.next_batch(batch_size)
