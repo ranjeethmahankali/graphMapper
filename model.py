@@ -97,10 +97,10 @@ def loss(vector, graph_true):
     # return tf.reduce_sum(tf.abs(graph_true - vector))
     # return tf.reduce_sum(tf.square(graph_true - vector))
     epsilon = 1e-9
-    cross_entropy = (graph_true * tf.log(vector + epsilon)) + ((1-graph_true)*tf.log(1-vector+epsilon))
+    cross_entropy = -((graph_true * tf.log(vector + epsilon)) + ((1-graph_true)*tf.log(1-vector+epsilon)))
     
     # adding this to summaries
-    ce_by_example = -tf.reduce_sum(cross_entropy, axis=1, name='cross_entropy')
+    ce_by_example = tf.reduce_sum(cross_entropy, axis=1, name='cross_entropy')
     summarize(ce_by_example)
 
     ce_loss = -tf.reduce_sum(cross_entropy)
