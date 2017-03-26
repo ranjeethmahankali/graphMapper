@@ -81,7 +81,7 @@ def interpret(image, keep_prob):
     # adding summaries for the final output
     summarize(f4)
 
-    return [f4, getGraph(f4)]
+    return [f4, getGraph(f4, True)]
 
 # this one converts the output of the network into 1 or 0 format
 def getGraph(vector, toSummarize = False):
@@ -89,7 +89,7 @@ def getGraph(vector, toSummarize = False):
     # and will need to do more than just rounding to map its output to 0 or 1
     # small constant for numerical stability
     epsilon = 1e-9
-    graph = tf.floor(2*(vector-epsilon))
+    graph = tf.floor(2*(vector-epsilon), name='graph_out')
     if toSummarize: 
         summarize(graph)
 
