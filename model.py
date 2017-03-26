@@ -3,29 +3,26 @@ from ops import *
 import tensorflow as tf
 
 with tf.variable_scope('vars'):
-    wc1 = weightVariable([5,5, 1,32],'wc1')
-    bc1 = biasVariable([32], 'bc1')
+    wc1 = weightVariable([5,5, 1,8],'wc1')
+    bc1 = biasVariable([8], 'bc1')
 
-    wc2 = weightVariable([5,5, 32,64],'wc2')
-    bc2 = biasVariable([64], 'bc2')
+    wc2 = weightVariable([5,5, 8,16],'wc2')
+    bc2 = biasVariable([16], 'bc2')
     
-    wc3 = weightVariable([5,5, 64,128],'wc3')
-    bc3 = biasVariable([128], 'bc3')
+    wc3 = weightVariable([5,5, 16,32],'wc3')
+    bc3 = biasVariable([32], 'bc3')
     
-    wc4 = weightVariable([5,5, 128,256],'wc4')
-    bc4 = biasVariable([256], 'bc4')
+    wc4 = weightVariable([5,5, 32,64],'wc4')
+    bc4 = biasVariable([64], 'bc4')
 
-    wf1 = weightVariable([3072, 4096], 'wf1')
-    bf1 = biasVariable([4096], 'bf1')
+    wf1 = weightVariable([768, 1024], 'wf1')
+    bf1 = biasVariable([1024], 'bf1')
 
-    wf2 = weightVariable([4096, 2048], 'wf2')
-    bf2 = biasVariable([2048], 'bf2')
+    wf2 = weightVariable([1024, 1024], 'wf2')
+    bf2 = biasVariable([1024], 'bf2')
 
-    wf3 = weightVariable([2048, 2048], 'wf3')
-    bf3 = biasVariable([2048], 'bf3')
-
-    wf4 = weightVariable([2048, 10], 'wf4')
-    bf4 = biasVariable([10], 'bf4')
+    wf3 = weightVariable([1024, 10], 'wf3')
+    bf3 = biasVariable([10], 'bf3')
 
 # adding summaries to all the above variables
 # all_vars = tf.trainable_variables()
@@ -35,16 +32,16 @@ with tf.variable_scope('vars'):
 
 # model scratchpad
 # [-1, 48, 64, 1] - image
-# [-1, 24, 32, 32] - h1
-# [-1, 12, 16, 64] - h2
-# [-1, 6, 8, 128] - h3
-# [-1, 3, 4, 256] - h4
+# [-1, 24, 32, 8] - h1
+# [-1, 12, 16, 16] - h2
+# [-1, 6, 8, 32] - h3
+# [-1, 3, 4, 64] - h4
 
-# [-1, 3072] - h4_flat
-# [-1, 4096] - f1
-# [-1, 2048] - f2
-# [-1, 2048] - f3
-# [-1, 10] - f4 - flat graph to be returned
+# [-1, 768] - h4_flat
+# dropout layer
+# [-1, 1024] - f1
+# [-1, 1024] - f2
+# [-1, 10] - f3
 
 # this function returns the placeholders for inputs and targets
 def getPlaceHolders():
@@ -70,18 +67,17 @@ def interpret(image, keep_prob):
     h3 = conv_pool(h2, wc3, bc3)
     h4 = conv_pool(h3, wc4, bc4)
 
-    h4_flat = tf.reshape(h4, [-1, 3072])
+    h4_flat = tf.reshape(h4, [-1, 768])
     h4_flat_drop = tf.nn.dropout(h4_flat, keep_prob)
 
     f1 = tf.nn.relu(tf.matmul(h4_flat_drop, wf1) + bf1)
     f2 = tf.nn.relu(tf.matmul(f1, wf2) + bf2)
-    f3 = tf.nn.relu(tf.matmul(f2, wf3) + bf3)
-    f4 = tf.nn.sigmoid(tf.matmul(f3, wf4) + bf4, name = 'output')
+    f3 = tf.nn.sigmoid(tf.matmul(f2, wf3) + bf3, name='output')
 
     # adding summaries for the final output
-    summarize(f4)
+    summarize(f3)
 
-    return [f4, getGraph(f4, True)]
+    return [f3, getGraph(f3, True)]
 
 # this one converts the output of the network into 1 or 0 format
 def getGraph(vector, toSummarize = False):
@@ -89,7 +85,8 @@ def getGraph(vector, toSummarize = False):
     # and will need to do more than just rounding to map its output to 0 or 1
     # small constant for numerical stability
     epsilon = 1e-9
-    graph = tf.floor(2*(vector-epsilon), name='graph_out')
+    graph = tf.round(vector, name='graph_out')
+    
     if toSummarize: 
         summarize(graph)
 
@@ -161,6 +158,7 @@ def accuracy(graph, graph_true):
 
 # this function returns the training step tensor
 def getOptimStep(vector, graph, target):
-    lossTensor = loss_custom(vector, graph, target)
+    # lossTensor = loss_custom(vector, graph, target)
+    lossTensor = loss(vector,target)
     optim = tf.train.AdamOptimizer(learning_rate).minimize(lossTensor)
     return [optim, lossTensor]
