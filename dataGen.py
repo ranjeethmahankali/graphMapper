@@ -396,7 +396,7 @@ coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 # the folder to which dataset will be saved
 dataDir = 'data/'
 # number of files
-fileNum = 101
+fileNum = 51
 # number of training configurations per file that we want
 dataNum = 100
 # number of door variations in each configuration
