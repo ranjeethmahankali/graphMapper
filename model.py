@@ -71,7 +71,7 @@ def interpret(image, keep_prob):
     h4_flat_drop = tf.nn.dropout(h4_flat, keep_prob)
 
     f1 = tf.nn.relu(tf.matmul(h4_flat_drop, wf1) + bf1)
-    f2 = tf.nn.relu(tf.matmul(f1, wf2) + bf2)
+    f2 = tf.nn.sigmoid(tf.matmul(f1, wf2) + bf2)
     f3 = tf.nn.sigmoid(tf.matmul(f2, wf3) + bf3, name='output')
 
     # adding summaries for the final output
