@@ -177,12 +177,12 @@ def getOptimStep(vector, graph, target):
         l2_loss += tf.nn.l2_loss(v)
 
     l2_loss *= alpha
-    
-    # adding to the summary
-    with tf.name_scope('l2_loss'):
-        tf.summary.scalar('l2_loss', l2_loss)
-    
     total_loss = lossTensor + l2_loss
+
+    # adding to the summary
+    with tf.name_scope('loss_params'):
+        tf.summary.scalar('l2_loss', l2_loss)
+        tf.summary.scalat('total_loss', total_loss)
 
     optim = tf.train.AdamOptimizer(learning_rate).minimize(lossTensor)
     return [optim, total_loss]
