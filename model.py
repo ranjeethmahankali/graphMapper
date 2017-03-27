@@ -21,11 +21,11 @@ with tf.variable_scope('vars'):
     wf2 = weightVariable([2048, 4096], 'wf2')
     bf2 = biasVariable([4096], 'bf2')
 
-    wf3 = weightVariable([4096, 1024], 'wf3')
-    bf3 = biasVariable([1024], 'bf3')
+    wf3 = weightVariable([4096, 10], 'wf3')
+    bf3 = biasVariable([10], 'bf3')
 
-    wf4 = weightVariable([1024, 10], 'wf4')
-    bf4 = biasVariable([10], 'bf4')
+    # wf4 = weightVariable([1024, 10], 'wf4')
+    # bf4 = biasVariable([10], 'bf4')
 
 # adding summaries to all the above variables
 all_vars = tf.trainable_variables()
@@ -75,13 +75,13 @@ def interpret(image, keep_prob):
 
     f1 = tf.nn.relu(tf.matmul(h4_flat_drop, wf1) + bf1)
     f2 = tf.nn.relu(tf.matmul(f1, wf2) + bf2)
-    f3 = tf.nn.relu(tf.matmul(f2, wf3) + bf3)
-    f4 = tf.nn.sigmoid(tf.matmul(f3, wf4) + bf4, name='output')
+    f3 = tf.nn.sigmoid(tf.matmul(f2, wf3) + bf3, name='output')
+    # f4 = tf.nn.sigmoid(tf.matmul(f3, wf4) + bf4, name='output')
 
     # adding summaries for the final output
-    summarize(f4)
+    summarize(f3)
 
-    return [f4, getGraph(f4, True)]
+    return [f3, getGraph(f3, True)]
 
 # this one converts the output of the network into 1 or 0 format
 def getGraph(vector, toSummarize = False):
