@@ -3,25 +3,25 @@ from ops import *
 import tensorflow as tf
 
 with tf.variable_scope('vars'):
-    wc1 = weightVariable([5,5, 1,8],'wc1')
-    bc1 = biasVariable([8], 'bc1')
+    wc1 = weightVariable([5,5, 1,16],'wc1')
+    bc1 = biasVariable([16], 'bc1')
 
-    wc2 = weightVariable([5,5, 8,16],'wc2')
-    bc2 = biasVariable([16], 'bc2')
+    wc2 = weightVariable([5,5, 16,32],'wc2')
+    bc2 = biasVariable([32], 'bc2')
     
-    wc3 = weightVariable([5,5, 16,32],'wc3')
-    bc3 = biasVariable([32], 'bc3')
+    wc3 = weightVariable([5,5, 32,64],'wc3')
+    bc3 = biasVariable([64], 'bc3')
     
-    wc4 = weightVariable([5,5, 32,64],'wc4')
-    bc4 = biasVariable([64], 'bc4')
+    wc4 = weightVariable([5,5, 64,128],'wc4')
+    bc4 = biasVariable([128], 'bc4')
 
-    wf1 = weightVariable([768, 1024], 'wf1')
-    bf1 = biasVariable([1024], 'bf1')
+    wf1 = weightVariable([1536, 2048], 'wf1')
+    bf1 = biasVariable([2048], 'bf1')
 
-    wf2 = weightVariable([1024, 1024], 'wf2')
-    bf2 = biasVariable([1024], 'bf2')
+    wf2 = weightVariable([2048, 4096], 'wf2')
+    bf2 = biasVariable([4096], 'bf2')
 
-    wf3 = weightVariable([1024, 10], 'wf3')
+    wf3 = weightVariable([4096, 10], 'wf3')
     bf3 = biasVariable([10], 'bf3')
 
 # adding summaries to all the above variables
@@ -67,11 +67,11 @@ def interpret(image, keep_prob):
     h3 = conv_pool(h2, wc3, bc3)
     h4 = conv_pool(h3, wc4, bc4)
 
-    h4_flat = tf.reshape(h4, [-1, 768])
+    h4_flat = tf.reshape(h4, [-1, 1536])
     h4_flat_drop = tf.nn.dropout(h4_flat, keep_prob)
 
     f1 = tf.nn.relu(tf.matmul(h4_flat_drop, wf1) + bf1)
-    f2 = tf.nn.sigmoid(tf.matmul(f1, wf2) + bf2)
+    f2 = tf.nn.relu(tf.matmul(f1, wf2) + bf2)
     f3 = tf.nn.sigmoid(tf.matmul(f2, wf3) + bf3, name='output')
 
     # adding summaries for the final output
