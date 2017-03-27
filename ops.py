@@ -54,7 +54,7 @@ def loadModel(sess, savedPath):
 
 # weight variable
 def weightVariable(shape, name):
-    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.05)
+    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.04)
     weight = tf.get_variable(name=name, shape=shape, initializer=initializer)
     return weight
 
