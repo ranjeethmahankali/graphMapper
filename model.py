@@ -170,5 +170,19 @@ def accuracy(graph, graph_true):
 def getOptimStep(vector, graph, target):
     # lossTensor = loss_custom(vector, graph, target)
     lossTensor = loss(vector,target)
+
+    # now implementing regularizations
+    l2_loss = 0
+    for v in varList:
+        l2_loss += tf.nn.l2_loss(v)
+
+    l2_loss *= alpha
+    
+    # adding to the summary
+    with tf.name_scope('l2_loss'):
+        tf.summary.scalar('l2_loss', l2_loss)
+    
+    total_loss = lossTensor + l2_loss
+
     optim = tf.train.AdamOptimizer(learning_rate).minimize(lossTensor)
-    return [optim, lossTensor]
+    return [optim, total_loss]
