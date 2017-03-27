@@ -114,7 +114,7 @@ def loss(vector, graph_true):
     # for v in varList:
     #     l2_loss += tf.nn.l2_loss(v)*alpha
 
-    return ce_loss/2
+    return ce_loss
     # return ce_loss + l2_loss
 
 # this is the custom loss that I used for the voxel models
