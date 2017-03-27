@@ -107,7 +107,7 @@ def loss(vector, graph_true):
     ce_by_example = tf.reduce_sum(cross_entropy, axis=1, name='cross_entropy')
     summarize(ce_by_example)
 
-    ce_loss = tf.reduce_mean(cross_entropy)
+    ce_loss = tf.reduce_sum(cross_entropy)
 
     # now implementing l2 loss
     # l2_loss = 0
