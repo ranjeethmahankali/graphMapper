@@ -25,8 +25,8 @@ with tf.variable_scope('vars'):
     bf3 = biasVariable([10], 'bf3')
 
 # adding summaries to all the above variables
-# all_vars = tf.trainable_variables()
-# varList = [v for v in all_vars if 'vars' in v.name]
+all_vars = tf.trainable_variables()
+varList = [v for v in all_vars if 'vars' in v.name]
 # for v in varList:
 #     summarize(v)
 
@@ -105,7 +105,12 @@ def loss(vector, graph_true):
 
     ce_loss = tf.reduce_sum(cross_entropy)
 
-    return ce_loss
+    # now implementing l2 loss
+    l2_loss = 0
+    for v in varList:
+        l2_loss += tf.nn.l2_loss(v)*alpha
+
+    return ce_loss + l2_loss
 
 # this is the custom loss that I used for the voxel models
 def loss_custom(m, g, gTrue):
