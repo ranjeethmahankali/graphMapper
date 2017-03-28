@@ -15,13 +15,13 @@ with tf.variable_scope('vars'):
     wc4 = weightVariable([5,5, 64,128],'wc4')
     bc4 = biasVariable([128], 'bc4')
 
-    wf1 = weightVariable([1536, 2048], 'wf1')
-    bf1 = biasVariable([2048], 'bf1')
+    wf1 = weightVariable([1536, 1536], 'wf1')
+    bf1 = biasVariable([1536], 'bf1')
 
-    wf2 = weightVariable([2048, 4096], 'wf2')
-    bf2 = biasVariable([4096], 'bf2')
+    wf2 = weightVariable([1536, 1024], 'wf2')
+    bf2 = biasVariable([1024], 'bf2')
 
-    wf3 = weightVariable([4096, 10], 'wf3')
+    wf3 = weightVariable([1024, 10], 'wf3')
     bf3 = biasVariable([10], 'bf3')
 
     # wf4 = weightVariable([1024, 10], 'wf4')
