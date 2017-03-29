@@ -403,7 +403,7 @@ dataNum = 100
 doorVarNum = 20
 # total size of the dataset is fileNum * dataNum * doorVarNum
 
-for n in range(100, 100+fileNum):
+for n in range(fileNum):
     im_data = list()
     graph_data = list()
     i = 0
@@ -434,6 +434,7 @@ for n in range(100, 100+fileNum):
         i += 1
 
     savePath = dataDir+str(n)+'.pkl'
+    # savePath = dataDir + 'test.pkl'
     writeToFile([im_data, graph_data], savePath)
     print('\nSaved to %s'%savePath)
     print('%s'%('-'*25))
