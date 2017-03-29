@@ -403,7 +403,7 @@ dataNum = 100
 doorVarNum = 20
 # total size of the dataset is fileNum * dataNum * doorVarNum
 
-for n in range(fileNum):
+for n in range(100, 100+fileNum):
     im_data = list()
     graph_data = list()
     i = 0

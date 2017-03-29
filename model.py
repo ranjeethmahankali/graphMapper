@@ -9,13 +9,13 @@ with tf.variable_scope('vars'):
     wc2 = weightVariable([5,5, 16,32],'wc2')
     bc2 = biasVariable([32], 'bc2')
     
-    wc3 = weightVariable([5,5, 32,64],'wc3')
-    bc3 = biasVariable([64], 'bc3')
+    wc3 = weightVariable([5,5, 32,48],'wc3')
+    bc3 = biasVariable([48], 'bc3')
     
-    wc4 = weightVariable([5,5, 64,128],'wc4')
-    bc4 = biasVariable([128], 'bc4')
+    wc4 = weightVariable([5,5, 48,64],'wc4')
+    bc4 = biasVariable([64], 'bc4')
 
-    wf1 = weightVariable([1536, 1536], 'wf1')
+    wf1 = weightVariable([768, 1536], 'wf1')
     bf1 = biasVariable([1536], 'bf1')
 
     wf2 = weightVariable([1536, 1024], 'wf2')
@@ -70,7 +70,7 @@ def interpret(image, keep_prob):
     h3 = conv_pool(h2, wc3, bc3)
     h4 = conv_pool(h3, wc4, bc4)
 
-    h4_flat = tf.reshape(h4, [-1, 1536])
+    h4_flat = tf.reshape(h4, [-1, 768])
     h4_flat_drop = tf.nn.dropout(h4_flat, keep_prob)
 
     f1 = tf.nn.relu(tf.matmul(h4_flat_drop, wf1) + bf1)

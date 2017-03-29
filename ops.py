@@ -10,15 +10,15 @@ from PIL import Image
 # imgSize = [96,128]
 imgSize = [64,48]
 spaceSize = [64,48]
-batch_size = 20
+batch_size = 40
 # folder to save the results in
 resDir = 'results/'
 # folder to log the training progress in
-log_dir  = 'train_log/2/'
+log_dir  = 'train_log/3/'
 
 learning_rate = 1e-5
 # below is the coefficient for l2 loss
-alpha = 1e-3
+alpha = 1e-2
 
 model_save_path = ['savedModels/model_1.ckpt',
                     'savedModels/model_2.ckpt']
