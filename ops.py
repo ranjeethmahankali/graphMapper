@@ -18,7 +18,7 @@ log_dir  = 'train_log/3/'
 
 learning_rate = 1e-5
 # below is the coefficient for l2 loss
-alpha = 3*1e-2
+alpha = 0.1
 
 model_save_path = ['savedModels/model_1.ckpt',
                     'savedModels/model_2.ckpt']
@@ -54,13 +54,13 @@ def loadModel(sess, savedPath):
 
 # weight variable
 def weightVariable(shape, name):
-    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.02)
+    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.01)
     weight = tf.get_variable(name=name, shape=shape, initializer=initializer)
     return weight
 
 # bias variable
 def biasVariable(shape, name):
-    initializer = tf.constant_initializer(0.01)
+    initializer = tf.constant_initializer(0.005)
     bias = tf.get_variable(name=name, shape=shape, initializer=initializer)
     return bias
 
