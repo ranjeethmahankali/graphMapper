@@ -18,9 +18,9 @@ with tf.Session() as sess:
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 10000
-    testStep = 100
-    saveStep = 2000
+    cycles = 20000
+    testStep = 200
+    saveStep = 4000
     log_step = 10
     startTime = time.time()
     test_batch_size = 1700

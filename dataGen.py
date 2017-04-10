@@ -406,7 +406,7 @@ doorVarNum = 20
 # total size of the dataset is fileNum * dataNum * doorVarNum
 
 startTime = time.time()
-for n in range(fileNum):
+for n in range(10, 10+fileNum):
     im_data = list()
     graph_data = list()
     i = 0
@@ -439,7 +439,7 @@ for n in range(fileNum):
             im_data.append(bottleneck_values)
             graph_data.append(flat_graph)
         
-        timeLeft = estimate_time(startTime, fileNum*dataNum, (n*dataNum)+i)
+        timeLeft = estimate_time(startTime, fileNum*dataNum, ((n-10)*dataNum)+i)
         sys.stdout.write('%s examples generated...%s\r'%(i+1, timeLeft))
         
         i += 1
