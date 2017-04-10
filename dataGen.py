@@ -394,9 +394,9 @@ class space(sg.cSpace):
 coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 
 # the folder to which dataset will be saved
-dataDir = 'data/'
+dataDir = 'inception_data/'
 # number of files
-fileNum = 100
+fileNum = 5
 # number of training configurations per file that we want
 dataNum = 100
 # number of door variations in each configuration
@@ -422,11 +422,14 @@ for n in range(fileNum):
             sample.removeDoors()
             sample.makeRandDoors()
 
-            img = sample.render().convert("L")# making the image grayscale
-            im_arr = prepareImage(img)
+            img = sample.render()
+            fileName = 'images/%s_%s_%s.png'%(n,i,j)
+            # im_arr = prepareImage(img)
             flat_graph = sample.getFlatGraph()
 
-            im_data.append(im_arr)
+            img.save(dataDir + fileName)
+            im_data.append(fileName)
+            # im_data.append(im_arr)
             graph_data.append(flat_graph)
 
         sys.stdout.write('%s examples generated\r'%(i+1))
