@@ -25,5 +25,7 @@ data2/
 savedModels/
 train_log/
 
+inception_data/
+inception_data/*
 inceptionGraph/
 inceptionGraph/*
