@@ -1,33 +1,34 @@
-from model import *
+# from model import *
+from inceptionModel import *
 import sys
 from ops import *
 
-image, target, keep_prob = getPlaceHolders()
-vector, graph = interpret(image, keep_prob)
+bottleneck, target, keep_prob = getPlaceHolders()
+vector, graph = interpret(bottleneck, keep_prob)
 optim, lossVal = getOptimStep(vector, graph, target)
 accuracy = accuracy(graph, target)
 
 # this is for the summaries during the training
 merged = tf.summary.merge_all()
 
-data = dataset('data/')
+data = dataset('inception_data/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     train_writer, test_writer = getSummaryWriters(sess)
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 2000000
-    testStep = 500
-    saveStep = 10000
+    cycles = 10000
+    testStep = 100
+    saveStep = 2000
     log_step = 10
     startTime = time.time()
-    test_batch_size = 2500
+    test_batch_size = 1700
     try:
         for i in range(cycles):
             batch = data.next_batch(batch_size)
             _, summary = sess.run([optim, merged], feed_dict={
-                image: batch[0],
+                bottleneck: batch[0],
                 target: batch[1],
                 keep_prob:0.5
             })
@@ -49,7 +50,7 @@ with tf.Session() as sess:
                     graph, 
                     vector
                     ],feed_dict={
-                    image: testBatch[0],
+                    bottleneck: testBatch[0],
                     target: testBatch[1],
                     keep_prob:1.0
                 })
