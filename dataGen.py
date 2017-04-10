@@ -6,6 +6,8 @@ import random
 import planeVec as pv
 import math
 
+from inceptionPrep import *
+
 # this is the 'wall' object
 class wall:
     def __init__(self, startPt, endPt, drawColor = '#000000', owner = None):
@@ -396,13 +398,14 @@ coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 # the folder to which dataset will be saved
 dataDir = 'inception_data/'
 # number of files
-fileNum = 5
+fileNum = 10
 # number of training configurations per file that we want
 dataNum = 100
 # number of door variations in each configuration
 doorVarNum = 20
 # total size of the dataset is fileNum * dataNum * doorVarNum
 
+startTime = time.time()
 for n in range(fileNum):
     im_data = list()
     graph_data = list()
@@ -424,15 +427,20 @@ for n in range(fileNum):
 
             img = sample.render()
             fileName = 'images/%s_%s_%s.png'%(n,i,j)
-            # im_arr = prepareImage(img)
+            im_arr = prepareImage(img, normalize=False)
+
+            bottleneck_values = run_bottleneck_on_image(sess, 
+                                                        im_arr, 
+                                                        jpeg_data_tensor, 
+                                                        bottleneck_tensor)
+
             flat_graph = sample.getFlatGraph()
-
-            img.save(dataDir + fileName)
-            im_data.append(fileName)
-            # im_data.append(im_arr)
+            
+            im_data.append(bottleneck_values)
             graph_data.append(flat_graph)
-
-        sys.stdout.write('%s examples generated\r'%(i+1))
+        
+        timeLeft = estimate_time(startTime, fileNum*dataNum, (n*dataNum)+i)
+        sys.stdout.write('%s examples generated...%s\r'%(i+1, timeLeft))
         
         i += 1
 
@@ -445,3 +453,14 @@ for n in range(fileNum):
 # sample.printSpace()
 # print(sample.getFlatGraph())
 # img.show()
+# img = Image.open('test.jpg')
+    # # buffer = BytesIO()
+    # # img.save(buffer, format='JPEG')
+    # # image_data = buffer.getvalue()
+    # arr = np.array(img)
+    # image_data = arr.astype(np.float32)
+    # # image_data = gfile.FastGFile('test.jpg', 'rb').read()
+    # startTime = time.time()
+    # bottleneck_values = run_bottleneck_on_image(sess, image_data, jpeg_data_tensor, bottleneck_tensor)
+    # delta = time.time() - startTime
+    # bottleneck_values = np.squeeze(bottleneck_values)
