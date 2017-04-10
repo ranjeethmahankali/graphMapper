@@ -104,10 +104,11 @@ def prepareImages(fileList):
     return np.array(batch)
 
 # this one prepares a single image and returns it as an array
-def prepareImage(img):
+def prepareImage(img, normalize = True):
     arr = np.array(img)
     arr = arr.astype(np.float32)
-    arr /= 255
+    if normalize:
+        arr /= 255
 
     return arr
 
@@ -183,8 +184,8 @@ class dataset:
             if not silent: print('\nLoading data from %s...'%self.curFile)
             dSet = pickle.load(inp)
         
-        self.data = [np.expand_dims(np.array(dSet[0]),3), np.array(dSet[1])]
-        # self.data = [np.array(dSet[0]), np.array(dSet[1])]
+        # self.data = [np.expand_dims(np.array(dSet[0]),3), np.array(dSet[1])]
+        self.data = [np.array(dSet[0]), np.array(dSet[1])]
         # self.data = dSet
         
         if self.test_data is None:
@@ -192,8 +193,8 @@ class dataset:
                 if not silent: print('\nLoading test data from %s...'%self.testFileName)
                 dSet = pickle.load(inp)
             
-            self.test_data = [np.expand_dims(np.array(dSet[0]),3), np.array(dSet[1])]
-            # self.test_data = [np.array(dSet[0]), np.array(dSet[1])]
+            # self.test_data = [np.expand_dims(np.array(dSet[0]),3), np.array(dSet[1])]
+            self.test_data = [np.array(dSet[0]), np.array(dSet[1])]
             # self.test_data = dSet
         if not silent: print('\nDataset in %s is successfully loaded\n'%self.dirPath)
     
