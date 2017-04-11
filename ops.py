@@ -95,13 +95,12 @@ def toImage(data):
     return Image.fromarray(newData)
 
 # this method converts a list of images into a feed ready batch
-def prepareImages(fileList):
+def prepareImages(imageList, normalize = True):
     batch = []
-    for fileName in fileList:
-        img = Image.open(fileName).convert("L")
-        arr = prepareImage(img)
+    for img in imageList:
+        arr = prepareImage(img, normalize=normalize)
         batch.append(arr)
-    return np.array(batch)
+    return batch
 
 # this one prepares a single image and returns it as an array
 def prepareImage(img, normalize = True):
