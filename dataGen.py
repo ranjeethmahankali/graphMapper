@@ -398,14 +398,14 @@ coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
 # the folder to which dataset will be saved
 dataDir = 'inception_data/'
 # number of files
-fileNum = 30
+fileNum = 50
 # number of training configurations per file that we want
 dataNum = 100
 # number of door variations in each configuration
 doorVarNum = 20
 # total size of the dataset is fileNum * dataNum * doorVarNum
 # this is the number of files that is already in the dataset folder
-filesCreated = 20
+filesCreated = 50
 
 startTime = time.time()
 for n in range(filesCreated, filesCreated+fileNum):
