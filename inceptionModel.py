@@ -6,10 +6,10 @@ with tf.variable_scope('vars'):
     wf1 = weightVariable([2048, 1024], 'wf1')
     bf1 = biasVariable([1024], 'bf1')
 
-    wf2 = weightVariable([1024, 512], 'wf2')
-    bf2 = biasVariable([512], 'bf2')
+    wf2 = weightVariable([1024, 1024], 'wf2')
+    bf2 = biasVariable([1024], 'bf2')
 
-    wf3 = weightVariable([512, 10], 'wf3')
+    wf3 = weightVariable([10024, 10], 'wf3')
     bf3 = biasVariable([10], 'bf3')
 
     # wf4 = weightVariable([1024, 10], 'wf4')
@@ -69,13 +69,7 @@ def loss(vector, graph_true):
 
     ce_loss = tf.reduce_sum(ce_by_example)
 
-    # now implementing l2 loss
-    # l2_loss = 0
-    # for v in varList:
-    #     l2_loss += tf.nn.l2_loss(v)*alpha
-
     return ce_loss
-    # return ce_loss + l2_loss
 
 # this is the custom loss that I used for the voxel models
 def loss_custom(m, g, gTrue):

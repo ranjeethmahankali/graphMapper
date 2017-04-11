@@ -15,7 +15,7 @@ data = dataset('inception_data/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     train_writer, test_writer = getSummaryWriters(sess)
-    loadModel(sess, model_save_path[0])
+    # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
     cycles = 1000000

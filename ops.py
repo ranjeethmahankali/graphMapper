@@ -18,7 +18,7 @@ log_dir  = 'train_log/3/'
 
 learning_rate = 1e-5
 # below is the coefficient for l2 loss
-alpha = 0.01
+alpha = 0.005
 
 model_save_path = ['savedModels/model_1.ckpt',
                     'savedModels/model_2.ckpt']
