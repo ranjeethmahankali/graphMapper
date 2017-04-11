@@ -31,9 +31,10 @@ def getPlaceHolders():
 
 # this interprets the image and returns the tensor corresponding to a flattened graph
 def interpret(bottleneck, keep_prob):
-    f1 = tf.nn.relu(tf.matmul(bottleneck, wf1) + bf1)
+    drop_input = tf.nn.dropout(bottleneck, keep_prob)
+    f1 = tf.nn.relu(tf.matmul(drop_input, wf1) + bf1)
     f1_drop = tf.nn.dropout(f1, keep_prob)
-    f2 = tf.nn.relu(tf.matmul(f1_drop, wf2) + bf2)
+    f2 = tf.nn.tanh(tf.matmul(f1_drop, wf2) + bf2)
     f3 = tf.nn.sigmoid(tf.matmul(f2, wf3) + bf3, name='output')
     # f4 = tf.nn.sigmoid(tf.matmul(f3, wf4) + bf4, name='output')
 
