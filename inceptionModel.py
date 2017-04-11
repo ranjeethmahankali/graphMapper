@@ -3,13 +3,13 @@ from ops import *
 import tensorflow as tf
 
 with tf.variable_scope('vars'):
-    wf1 = weightVariable([2048, 2048], 'wf1')
-    bf1 = biasVariable([2048], 'bf1')
+    wf1 = weightVariable([2048, 1024], 'wf1')
+    bf1 = biasVariable([1024], 'bf1')
 
-    wf2 = weightVariable([2048, 1536], 'wf2')
-    bf2 = biasVariable([1536], 'bf2')
+    wf2 = weightVariable([1024, 512], 'wf2')
+    bf2 = biasVariable([512], 'bf2')
 
-    wf3 = weightVariable([1536, 10], 'wf3')
+    wf3 = weightVariable([512, 10], 'wf3')
     bf3 = biasVariable([10], 'bf3')
 
     # wf4 = weightVariable([1024, 10], 'wf4')
@@ -33,7 +33,7 @@ def getPlaceHolders():
 def interpret(bottleneck, keep_prob):
     f1 = tf.nn.relu(tf.matmul(bottleneck, wf1) + bf1)
     f1_drop = tf.nn.dropout(f1, keep_prob)
-    f2 = tf.nn.tanh(tf.matmul(f1_drop, wf2) + bf2)
+    f2 = tf.nn.relu(tf.matmul(f1_drop, wf2) + bf2)
     f3 = tf.nn.sigmoid(tf.matmul(f2, wf3) + bf3, name='output')
     # f4 = tf.nn.sigmoid(tf.matmul(f3, wf4) + bf4, name='output')
 
@@ -50,7 +50,7 @@ def getGraph(vector, toSummarize = False):
     epsilon = 1e-9
     graph = tf.round(vector, name='graph_out')
     
-    if toSummarize: 
+    if toSummarize:
         summarize(graph)
 
     return graph
