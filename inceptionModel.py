@@ -9,7 +9,7 @@ with tf.variable_scope('vars'):
     wf2 = weightVariable([1024, 1024], 'wf2')
     bf2 = biasVariable([1024], 'bf2')
 
-    wf3 = weightVariable([10024, 10], 'wf3')
+    wf3 = weightVariable([1024, 10], 'wf3')
     bf3 = biasVariable([10], 'bf3')
 
     # wf4 = weightVariable([1024, 10], 'wf4')
