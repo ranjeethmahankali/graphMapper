@@ -54,7 +54,7 @@ with tf.Session() as sess:
                     target: testBatch[1],
                     keep_prob:1.0
                 })
-                test_writer.add_summary(summary, i+200000)
+                test_writer.add_summary(summary, i)
 
                 g_sum = int(np.sum(graph_out))
                 t_sum = int(np.sum(testBatch[1]))
