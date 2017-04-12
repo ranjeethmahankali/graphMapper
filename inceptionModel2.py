@@ -71,5 +71,5 @@ def accuracy(graph, graph_true):
 def getOptimStep(vector, graph, target):
     # lossTensor = loss_custom(vector, graph, target)
     lossTensor = loss(vector,target)
-    optim = tf.train.AdamOptimizer(learning_rate).minimize(lossTensor)
+    optim = tf.train.GradientDescentOptimizer(0.5).minimize(lossTensor)
     return [optim, lossTensor]
