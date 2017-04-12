@@ -31,14 +31,14 @@ with tf.Session() as sess:
                 bottleneck: batch[0],
                 target: batch[1]
             })
-            if i % log_step == 0: train_writer.add_summary(summary, i)
+            # if i % log_step == 0: train_writer.add_summary(summary, i)
 
             timer = estimate_time(startTime, cycles, i)
             pL = 20 # this is the length of the progress bar to be displayed
             pNum = i % pL
             pBar = '#'*pNum + ' '*(pL - pNum)
 
-            sys.stdout.write('...Training...|%s|-(%s/%s)- %s\r'%(pBar, i, cycles, timer))
+            # sys.stdout.write('...Training...|%s|-(%s/%s)- %s\r'%(pBar, i, cycles, timer))
 
             if i % testStep == 0:
                 testBatch = data.test_batch(test_batch_size)
@@ -52,7 +52,7 @@ with tf.Session() as sess:
                     bottleneck: testBatch[0],
                     target: testBatch[1]
                 })
-                test_writer.add_summary(summary, i)
+                # test_writer.add_summary(summary, i)
 
                 g_sum = int(np.sum(graph_out))
                 t_sum = int(np.sum(testBatch[1]))
@@ -65,10 +65,10 @@ with tf.Session() as sess:
         
         # now saving the trained model every 1500 cycles
             if i % saveStep == 0 and i != 0:
-                saveModel(sess, model_save_path[0])
+                saveModel(sess, model_save_path[1])
         
         # saving the model in the end
-        saveModel(sess, model_save_path[0])
+        saveModel(sess, model_save_path[1])
     # if the training is interrupted from keyboard (ctrl + c)
     except KeyboardInterrupt:
         print('')
@@ -76,7 +76,7 @@ with tf.Session() as sess:
         decision = input('Do you want to save the current model before exiting? (y/n):')
 
         if decision == 'y':
-            saveModel(sess, model_save_path[0])
+            saveModel(sess, model_save_path[1])
         elif decision == 'n':
             print('\n...Model not saved...')
             pass
