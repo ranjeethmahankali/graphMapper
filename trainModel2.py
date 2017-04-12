@@ -1,7 +1,7 @@
 # from model import *
 from inceptionModel2 import *
 import sys
-from ops import *
+from ops2 import *
 
 bottleneck, target = getPlaceHolders()
 vector, graph = interpret(bottleneck)
@@ -21,7 +21,7 @@ with tf.Session() as sess:
     cycles = 1000000
     testStep = 1000
     saveStep = 20000
-    log_step = 10
+    log_step = 500
     startTime = time.time()
     test_batch_size = 2000
     try:
@@ -31,7 +31,7 @@ with tf.Session() as sess:
                 bottleneck: batch[0],
                 target: batch[1]
             })
-            # if i % log_step == 0: train_writer.add_summary(summary, i)
+            if i % log_step == 0: train_writer.add_summary(summary, i)
 
             timer = estimate_time(startTime, cycles, i)
             pL = 20 # this is the length of the progress bar to be displayed
@@ -52,7 +52,7 @@ with tf.Session() as sess:
                     bottleneck: testBatch[0],
                     target: testBatch[1]
                 })
-                # test_writer.add_summary(summary, i)
+                test_writer.add_summary(summary, i)
 
                 g_sum = int(np.sum(graph_out))
                 t_sum = int(np.sum(testBatch[1]))
