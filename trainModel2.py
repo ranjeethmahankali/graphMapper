@@ -23,7 +23,7 @@ with tf.Session() as sess:
     saveStep = 4000
     log_step = 10
     startTime = time.time()
-    test_batch_size = 1700
+    test_batch_size = 2000
     try:
         for i in range(cycles):
             batch = data.next_batch(batch_size)
