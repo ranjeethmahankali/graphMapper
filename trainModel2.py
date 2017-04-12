@@ -16,11 +16,11 @@ with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     train_writer, test_writer = getSummaryWriters(sess)
     # loadModel(sess, model_save_path[0])
-    # loadModel(sess, model_save_path[1])
+    loadModel(sess, model_save_path[1])
 
     cycles = 1000000
-    testStep = 200
-    saveStep = 4000
+    testStep = 1000
+    saveStep = 20000
     log_step = 10
     startTime = time.time()
     test_batch_size = 2000
@@ -61,7 +61,7 @@ with tf.Session() as sess:
                 # tracker = (i/testStep)%(2500/test_batch_size)
                 # print(testBatch[0][0])
                 # print(vec[0], testBatch[1][0])
-                print('Acc: %.2f; L: %.2f; Sums: %s/%s%s'%(acc, lval,g_sum,t_sum,' '*40))
+                print('%s-Acc: %.2f; L: %.2f; Sums: %s/%s%s'%(i,acc, lval,g_sum,t_sum,' '*40))
         
         # now saving the trained model every 1500 cycles
             if i % saveStep == 0 and i != 0:
