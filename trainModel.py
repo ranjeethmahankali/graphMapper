@@ -2,6 +2,7 @@
 from inceptionModel import *
 import sys
 from ops import *
+import shutil
 
 bottleneck, target, keep_prob = getPlaceHolders()
 vector, graph = interpret(bottleneck, keep_prob)
@@ -14,11 +15,13 @@ merged = tf.summary.merge_all()
 data = dataset('inception_data/')
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
+    # creating new summary writers and deleting old summary logs
+    shutil.rmtree(log_dir, ignore_errors=True)
     train_writer, test_writer = getSummaryWriters(sess)
-    # loadModel(sess, model_save_path[0])
+    loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 500000
+    cycles = 1200000
     testStep = 500
     saveStep = 4000
     log_step = 100
@@ -67,10 +70,10 @@ with tf.Session() as sess:
         
         # now saving the trained model every 1500 cycles
             if i % saveStep == 0 and i != 0:
-                saveModel(sess, model_save_path[0])
+                saveModel(sess, model_save_path[1])
         
         # saving the model in the end
-        saveModel(sess, model_save_path[0])
+        saveModel(sess, model_save_path[1])
     # if the training is interrupted from keyboard (ctrl + c)
     except KeyboardInterrupt:
         print('')
@@ -78,7 +81,7 @@ with tf.Session() as sess:
         decision = input('Do you want to save the current model before exiting? (y/n):')
 
         if decision == 'y':
-            saveModel(sess, model_save_path[0])
+            saveModel(sess, model_save_path[1])
         elif decision == 'n':
             print('\n...Model not saved...')
             pass
