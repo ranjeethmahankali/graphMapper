@@ -1,10 +1,17 @@
-from ops import *
+from ops2 import *
 # from dataGen import space
 import tensorflow as tf
 
 with tf.variable_scope('vars'):
-    wf1 = weightVariable([2048, 10], 'wf1')
-    bf1 = biasVariable([10], 'bf1')
+    wf1 = weightVariable([2048, 1024], 'wf1')
+    bf1 = biasVariable([1024], 'bf1')
+
+    wf2 = weightVariable([1024, 1024], 'wf2')
+    bf2 = biasVariable([1024], 'bf2')
+
+    wf3 = weightVariable([1024, 10], 'wf3')
+    bf3 = biasVariable([10], 'bf3')
+
     # wf4 = weightVariable([1024, 10], 'wf4')
     # bf4 = biasVariable([10], 'bf4')
 
@@ -18,21 +25,28 @@ def getPlaceHolders():
     # converted into a numpy array
     bottleneck = tf.placeholder(tf.float32, shape=[None, 2048])
     graph_target = tf.placeholder(tf.float32, shape=[None, 10])
+    keep_prob = tf.placeholder(tf.float32)
 
-    return [bottleneck, graph_target]
+    return [bottleneck, graph_target, keep_prob]
 
 # this interprets the image and returns the tensor corresponding to a flattened graph
-def interpret(bottleneck):
-    y = tf.nn.sigmoid(tf.matmul(bottleneck, wf1) + bf1)
+def interpret(bottleneck, keep_prob):
+    drop_input = tf.nn.dropout(bottleneck, keep_prob)
+    f1 = tf.nn.relu(tf.matmul(drop_input, wf1) + bf1)
+    f1_drop = tf.nn.dropout(f1, keep_prob)
+    f2 = tf.nn.tanh(tf.matmul(f1_drop, wf2) + bf2)
+    f3 = tf.nn.sigmoid(tf.matmul(f2, wf3) + bf3, name='output')
+    # f4 = tf.nn.sigmoid(tf.matmul(f3, wf4) + bf4, name='output')
+
     # adding summaries for the final output
-    summarize(y)
-    return [y, getGraph(y, True)]
+    summarize(f3)
+
+    return [f3, getGraph(f3, True)]
 
 # this one converts the output of the network into 1 or 0 format
 def getGraph(vector, toSummarize = False):
     # defined this as a separate function just in case I change the network in the future
     # and will need to do more than just rounding to map its output to 0 or 1
-    # small constant for numerical stability
     graph = tf.round(vector, name='graph_out')
     
     if toSummarize:
@@ -42,8 +56,6 @@ def getGraph(vector, toSummarize = False):
 
 # this method returns the loss tensor
 def loss(vector, graph_true):
-    # return tf.reduce_sum(tf.abs(graph_true - vector))
-    # return tf.reduce_sum(tf.square(graph_true - vector))
     epsilon = 1e-9
     cross_entropy = -((graph_true * tf.log(vector + epsilon)) + ((1-graph_true)*tf.log(1-vector+epsilon)))
     
@@ -71,5 +83,19 @@ def accuracy(graph, graph_true):
 def getOptimStep(vector, graph, target):
     # lossTensor = loss_custom(vector, graph, target)
     lossTensor = loss(vector,target)
-    optim = tf.train.AdamOptimizer(0.001).minimize(lossTensor)
-    return [optim, lossTensor]
+
+    # now implementing regularizations
+    l2_loss = 0
+    for v in varList:
+        l2_loss += tf.nn.l2_loss(v)
+
+    l2_loss *= alpha
+    total_loss = lossTensor + l2_loss
+
+    # adding to the summary
+    with tf.name_scope('loss_params'):
+        tf.summary.scalar('l2_loss', l2_loss)
+        tf.summary.scalar('total_loss', total_loss)
+
+    optim = tf.train.AdamOptimizer(learning_rate).minimize(total_loss)
+    return [optim, total_loss]

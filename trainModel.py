@@ -30,7 +30,7 @@ with tf.Session() as sess:
             _, summary = sess.run([optim, merged], feed_dict={
                 bottleneck: batch[0],
                 target: batch[1],
-                keep_prob:0.5
+                keep_prob:0.8
             })
             if i % log_step == 0: train_writer.add_summary(summary, i)
 
