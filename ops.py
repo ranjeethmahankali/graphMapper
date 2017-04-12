@@ -16,7 +16,7 @@ resDir = 'results/'
 # folder to log the training progress in
 log_dir  = 'train_log/3/'
 
-learning_rate = 1e-5
+learning_rate = 1e-4
 # below is the coefficient for l2 loss
 alpha = 0.005
 
