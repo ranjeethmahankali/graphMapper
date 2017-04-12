@@ -18,7 +18,7 @@ with tf.Session() as sess:
     # loadModel(sess, model_save_path[0])
     # loadModel(sess, model_save_path[1])
 
-    cycles = 3000000
+    cycles = 500000
     testStep = 500
     saveStep = 4000
     log_step = 100
@@ -30,7 +30,7 @@ with tf.Session() as sess:
             _, summary = sess.run([optim, merged], feed_dict={
                 bottleneck: batch[0],
                 target: batch[1],
-                keep_prob:0.8
+                keep_prob:0.7
             })
             if i % log_step == 0: train_writer.add_summary(summary, i)
 

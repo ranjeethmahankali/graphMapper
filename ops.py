@@ -14,7 +14,7 @@ batch_size = 50
 # folder to save the results in
 resDir = 'results/'
 # folder to log the training progress in
-log_dir  = 'train_log/3/'
+log_dir  = 'train_log/4/'
 
 learning_rate = 1e-4
 # below is the coefficient for l2 loss
