@@ -400,12 +400,12 @@ dataDir = 'inception_data/'
 # number of files
 fileNum = 50
 # number of training configurations per file that we want
-dataNum = 100
+dataNum = 200
 # number of door variations in each configuration
-doorVarNum = 20
+doorVarNum = 10
 # total size of the dataset is fileNum * dataNum * doorVarNum
 # this is the number of files that is already in the dataset folder
-filesCreated = 50
+filesCreated = 0
 
 startTime = time.time()
 for n in range(filesCreated, filesCreated+fileNum):
@@ -416,7 +416,7 @@ for n in range(filesCreated, filesCreated+fileNum):
         sample = space('sample', nameList, coords)
         sample.populatePts()
         sample.makeWalls()
-        if len(sample.c) < 5:
+        if len(sample.c) < len(nameList):
             # this is when 3 or more points lie on the walls and
             # mess everything up, we just ignore and repeat since
             # this is a rare random occurence
@@ -428,6 +428,7 @@ for n in range(filesCreated, filesCreated+fileNum):
             sample.makeRandDoors()
 
             img = sample.render()
+            # img.show()
             fileName = 'images/%s_%s_%s.png'%(n,i,j)
             im_arr = prepareImage(img, normalize=False)
 
@@ -437,6 +438,7 @@ for n in range(filesCreated, filesCreated+fileNum):
                                                         bottleneck_tensor)
 
             flat_graph = sample.getFlatGraph()
+            # print(flat_graph)
             
             im_data.append(bottleneck_values)
             graph_data.append(flat_graph)

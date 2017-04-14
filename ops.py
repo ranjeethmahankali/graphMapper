@@ -8,9 +8,9 @@ from PIL import Image
 # some global params
 # the directory to which teh results will be saved
 # imgSize = [96,128]
-imgSize = [64,48]
-spaceSize = [64,48]
-batch_size = 250
+imgSize = [32,32]
+spaceSize = [32,32]
+batch_size = 50
 # folder to save the results in
 resDir = 'results/'
 # folder to log the training progress in
@@ -26,7 +26,6 @@ model_save_path = ['savedModels/model_1.ckpt',
 # in every traning example, these will be the names of the 5 spaces
 nameList = ['red',
             'green',
-            'blue',
             'yellow',
             'white']
 # And this dictionary provides the color as RGB tuple for a space with a certian name

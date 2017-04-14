@@ -9,8 +9,8 @@ with tf.variable_scope('vars'):
     wf2 = weightVariable([1024, 1024], 'wf2')
     bf2 = biasVariable([1024], 'bf2')
 
-    wf3 = weightVariable([1024, 10], 'wf3')
-    bf3 = biasVariable([10], 'bf3')
+    wf3 = weightVariable([1024, 6], 'wf3')
+    bf3 = biasVariable([6], 'bf3')
 
     # wf4 = weightVariable([1024, 10], 'wf4')
     # bf4 = biasVariable([10], 'bf4')
@@ -24,7 +24,7 @@ def getPlaceHolders():
     # the imgSize list is flipped because height and width of image are flipped when
     # converted into a numpy array
     bottleneck = tf.placeholder(tf.float32, shape=[None, 2048])
-    graph_target = tf.placeholder(tf.float32, shape=[None, 10])
+    graph_target = tf.placeholder(tf.float32, shape=[None, 6])
     keep_prob = tf.placeholder(tf.float32)
 
     return [bottleneck, graph_target, keep_prob]
@@ -70,43 +70,6 @@ def loss(vector, graph_true):
     ce_loss = tf.reduce_sum(ce_by_example)
 
     return ce_loss
-
-# this is the custom loss that I used for the voxel models
-def loss_custom(m, g, gTrue):
-    # this is the absolute difference between the two tensors
-    absDiff = tf.abs(m - gTrue)
-    
-    scale = 10
-    g_sum = tf.reduce_sum(g) / scale
-    gTrue_sum = tf.reduce_sum(gTrue) / scale
-
-    maskZeros = gTrue
-    maskOnes = 1 - gTrue
-
-    # this is the error for not filling the voxels that are supposed to be filled
-    error_ones = tf.reduce_sum(tf.mul(absDiff, maskZeros))
-    # this is the error for filling the voxels that are not supposed to be filled
-    error_zeros = tf.reduce_sum(tf.mul(absDiff, maskOnes))
-
-    # this is the dynamic factor representing how much you care about which error
-    factor = tf.nn.sigmoid(g_sum - gTrue_sum)
-
-    error = (factor*error_zeros) + ((1-factor)*error_ones)
-
-    # sending this to summary
-    with tf.name_scope('loss_params'):
-        tf.summary.scalar('toggleFactor', factor)
-        tf.summary.scalar('e_zeros', (factor * error_zeros))
-        tf.summary.scalar('e_ones', ((1-factor)*error_ones))
-        tf.summary.scalar('e_combined', error)
-
-    # now implementing l2 loss
-    # l2_loss = 0
-    # for v in varList:
-    #     l2_loss += tf.nn.l2_loss(v)*alpha
-
-    # return (error + l2_loss)
-    return error
 
 # this function returns the accuracy tensor
 def accuracy(graph, graph_true):
