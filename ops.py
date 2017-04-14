@@ -10,13 +10,13 @@ from PIL import Image
 # imgSize = [96,128]
 imgSize = [64,48]
 spaceSize = [64,48]
-batch_size = 100
+batch_size = 250
 # folder to save the results in
 resDir = 'results/'
 # folder to log the training progress in
 log_dir  = 'train_log/6/'
 
-learning_rate = 5*1e-4
+learning_rate = 1e-4
 # below is the coefficient for l2 loss
 alpha = 0.002
 
