@@ -14,11 +14,11 @@ batch_size = 100
 # folder to save the results in
 resDir = 'results/'
 # folder to log the training progress in
-log_dir  = 'train_log/5/'
+log_dir  = 'train_log/6/'
 
-learning_rate = 1e-4
+learning_rate = 5*1e-4
 # below is the coefficient for l2 loss
-alpha = 0.005
+alpha = 0.002
 
 model_save_path = ['savedModels/model_1.ckpt',
                     'savedModels/model_2.ckpt']
