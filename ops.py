@@ -28,6 +28,8 @@ nameList = ['red',
             'green',
             'yellow',
             'white']
+# calculating the number of possible connections based on the number of spaces.
+con_num = int(len(nameList)*(len(nameList)-1)*0.5)
 # And this dictionary provides the color as RGB tuple for a space with a certian name
 colors = {
     'red':(255,0,0),
