@@ -3,14 +3,14 @@ from ops import *
 import tensorflow as tf
 
 with tf.variable_scope('vars'):
-    wf1 = weightVariable([2048, 1024], 'wf1')
-    bf1 = biasVariable([1024], 'bf1')
+    wf1 = weightVariable([2048, 3072], 'wf1')
+    bf1 = biasVariable([3072], 'bf1')
 
-    wf2 = weightVariable([1024, 1024], 'wf2')
-    bf2 = biasVariable([1024], 'bf2')
+    wf2 = weightVariable([3072, 2048], 'wf2')
+    bf2 = biasVariable([2048], 'bf2')
 
-    wf3 = weightVariable([1024, 6], 'wf3')
-    bf3 = biasVariable([6], 'bf3')
+    wf3 = weightVariable([2048, con_num], 'wf3')
+    bf3 = biasVariable([con_num], 'bf3')
 
     # wf4 = weightVariable([1024, 10], 'wf4')
     # bf4 = biasVariable([10], 'bf4')
@@ -24,7 +24,7 @@ def getPlaceHolders():
     # the imgSize list is flipped because height and width of image are flipped when
     # converted into a numpy array
     bottleneck = tf.placeholder(tf.float32, shape=[None, 2048])
-    graph_target = tf.placeholder(tf.float32, shape=[None, 6])
+    graph_target = tf.placeholder(tf.float32, shape=[None, con_num])
     keep_prob = tf.placeholder(tf.float32)
 
     return [bottleneck, graph_target, keep_prob]
