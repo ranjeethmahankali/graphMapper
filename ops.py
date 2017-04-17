@@ -256,7 +256,7 @@ def writeToFile(data, path):
     with open(path, 'wb') as output:
         pickle.dump(data, output, pickle.HIGHEST_PROTOCOL)
 
-# this creates summaries for variables to be sued by tensorboard
+# this creates summaries for variables to be used by tensorboard
 def summarize(varT):
     varName = varT.name[:-2]
     with tf.name_scope(varName):
