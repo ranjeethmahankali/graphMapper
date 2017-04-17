@@ -48,7 +48,6 @@ def getGraph(vector, toSummarize = False):
     # defined this as a separate function just in case I change the network in the future
     # and will need to do more than just rounding to map its output to 0 or 1
     # small constant for numerical stability
-    epsilon = 1e-9
     graph = tf.round(vector, name='graph_out')
     
     if toSummarize:
