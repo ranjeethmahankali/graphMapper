@@ -53,10 +53,11 @@ with tf.Session() as sess:
                     graph, 
                     vector
                     ],feed_dict={
-                    bottleneck: testBatch[0],
-                    target: testBatch[1],
-                    keep_prob:1.0
-                })
+                        bottleneck: testBatch[0],
+                        target: testBatch[1],
+                        keep_prob:1.0
+                    }
+                )
                 test_writer.add_summary(summary, i)
 
                 g_sum = int(np.sum(graph_out))
