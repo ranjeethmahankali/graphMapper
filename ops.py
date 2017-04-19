@@ -82,7 +82,6 @@ def max_pool2x2x1(x):
     return tf.nn.max_pool3d(x,ksize=[1,2,2,1,1],strides=[1,2,2,1,1],padding='SAME')
 
 # this is a 2x2 max-pooling layer for 2d convolutional layers
-# this is max-pooling for 3d convolutional layers
 def max_pool2x2(x):
     return tf.nn.max_pool(x,ksize=[1,2,2,1],strides=[1,2,2,1],padding='SAME')
 

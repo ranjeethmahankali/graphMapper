@@ -15,7 +15,7 @@ with tf.variable_scope('vars'):
     # wf4 = weightVariable([1024, 10], 'wf4')
     # bf4 = biasVariable([10], 'bf4')
 
-# adding summaries to all the above variables
+# list of vars we care about
 all_vars = tf.trainable_variables()
 varList = [v for v in all_vars if 'vars' in v.name]
 
