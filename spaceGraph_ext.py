@@ -6,8 +6,6 @@ import random
 import planeVec as pv
 import math
 
-from inceptionPrep import *
-
 # this is the 'wall' object
 class wall:
     def __init__(self, startPt, endPt, drawColor = '#000000', owner = None):
