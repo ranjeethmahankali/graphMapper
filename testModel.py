@@ -4,8 +4,9 @@ from spaceGraph_ext import *
 
 bottleneck_vals = []
 
-for i in range(10):
-    fileName = 'results/%s.png'%i
+fileNum = len(os.listdir(resDir))
+for i in range(fileNum):
+    fileName = resDir+'%s.png'%i
     img_arr = prepareImage(Image.open(fileName), normalize=False)
 
     bottleneck_val = ip.run_bottleneck_on_image(ip.sess_inception, 
@@ -33,11 +34,12 @@ with tf.Session() as sess:
         keep_prob:1.0
     })
 
-    flatGraph = flat_graph_list[0]
-    print(flatGraph)
     sampleSpace = space('sample', nameList, default_coords)
-    for i in range(len(flatGraph)):
-        if flatGraph[i]==0:continue
-        
-        a,b = sampleSpace.getConSpaces(i)
-        print(nameList[a], nameList[b])
+    for n in range(len(flat_graph_list)):
+        flatGraph = flat_graph_list[n]
+        for i in range(len(flatGraph)):
+            if flatGraph[i]==0:continue
+            a,b = sampleSpace.getConSpaces(i)
+            print(nameList[a], nameList[b])
+
+        print('==================================')
