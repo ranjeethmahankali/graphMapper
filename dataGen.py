@@ -2,7 +2,7 @@ from spaceGraph_ext import *
 from inceptionPrep import *
 # the main logic begins here, if any
 
-coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
+coords = default_coords
 
 # the folder to which dataset will be saved
 dataDir = 'inception_data/'
@@ -41,7 +41,7 @@ for n in range(filesCreated, filesCreated+fileNum):
             fileName = 'images/%s_%s_%s.png'%(n,i,j)
             im_arr = prepareImage(img, normalize=False)
 
-            bottleneck_values = run_bottleneck_on_image(sess, 
+            bottleneck_values = run_bottleneck_on_image(sess_inception, 
                                                         im_arr, 
                                                         jpeg_data_tensor, 
                                                         bottleneck_tensor)
