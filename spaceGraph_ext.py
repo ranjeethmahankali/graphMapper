@@ -6,6 +6,8 @@ import random
 import planeVec as pv
 import math
 
+default_coords = {'pt':[], 'x0':0,'x1':imgSize[0],'y0':0,'y1':imgSize[1]}
+
 # this is the 'wall' object
 class wall:
     def __init__(self, startPt, endPt, drawColor = '#000000', owner = None):
