@@ -29,3 +29,6 @@ inception_data/
 inception_data/*
 inceptionGraph/
 inceptionGraph/*
+
+results/
+results/*
