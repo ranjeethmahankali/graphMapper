@@ -68,8 +68,8 @@ model_fn = os.path.join(model_dir, 'classify_image_graph_def.pb')
 maybe_download_and_extract()
 
 
-graph = tf.Graph()
-sess = tf.InteractiveSession(graph = graph)
+graph_inception = tf.Graph()
+sess_inception = tf.InteractiveSession(graph = graph_inception)
 with tf.gfile.FastGFile(model_fn, 'rb') as f:
     graph_def = tf.GraphDef()
     graph_def.ParseFromString(f.read())
