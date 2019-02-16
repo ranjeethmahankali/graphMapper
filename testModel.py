@@ -5,8 +5,11 @@ from spaceGraph_ext import *
 bottleneck_vals = []
 
 fileNum = len(os.listdir(resDir))
+print(fileNum)
 for i in range(fileNum):
     fileName = resDir+'%s.png'%i
+    if not os.path.isfile(fileName):
+        continue
     img_arr = prepareImage(Image.open(fileName), normalize=False)
 
     bottleneck_val = ip.run_bottleneck_on_image(ip.sess_inception, 
